@@ -8,3 +8,5 @@
   + https://github.com/data-creative/express-on-rails-starter-app/
   + http://data-creative.info/process-documentation/2015/07/25/how-to-deploy-a-rails-app-to-heroku/
   + https://blog.heroku.com/using-bundler-groups-on-heroku
+  + https://devcenter.heroku.com/articles/getting-started-with-rails5
+  + https://blog.heroku.com/container_ready_rails_5
