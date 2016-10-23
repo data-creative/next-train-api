@@ -57,5 +57,6 @@ Rails.application.configure do
     g.test_framework :rspec
     g.assets = false
     g.helper = false
+    g.factory_girl
   end
 end
