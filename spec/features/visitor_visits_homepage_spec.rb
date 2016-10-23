@@ -9,5 +9,13 @@ RSpec.describe "Visitor Visits Homepage", type: :feature do
     it "should contain a welcome message" do
       expect(page).to have_content("Hello World")
     end
+
+    it "should contain a link to the source code" do
+      expect(page).to have_content("Source Code")
+    end
+
+    it "should contain a sign-up link" do
+      expect(page).to have_content("Register for an API key")
+    end
   end
 end
