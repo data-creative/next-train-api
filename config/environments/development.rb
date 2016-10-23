@@ -59,4 +59,15 @@ Rails.application.configure do
     g.helper = false
     g.factory_girl
   end
+
+  #
+  # Configure Devise.
+  #
+
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+
+  # Send mail through smtp://localhost:1025 for 'mailcatcher' gem.
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {:address => "localhost", :port => 1025}
+
 end
