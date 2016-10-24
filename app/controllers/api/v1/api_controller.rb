@@ -1,11 +1,24 @@
 class Api::V1::ApiController < ApplicationController
+
+  def index
+    @response = {
+      :url => request.url,
+      :params => params.reject{|k,v| ["controller","format","action"].include?(k) },
+      :received_at => Time.zone.now,
+      :errors => [],
+      :results => {:message => "Hello World"}
+    }
+
+    respond_to do |format|
+      format.json { render json: JSON.pretty_generate(@response) }
+    end
+  end
+
   def stations
     @response = {
-      :request => {
-        :url => request.url,
-        :params => params.reject{|k,v| ["controller","format","action"].include?(k) },
-        :received_at => Time.zone.now
-      },
+      :url => request.url,
+      :params => params.reject{|k,v| ["controller","format","action"].include?(k) },
+      :received_at => Time.zone.now,
       :errors => [],
       :results => []
     }
@@ -43,4 +56,24 @@ class Api::V1::ApiController < ApplicationController
       format.json { render json: JSON.pretty_generate(@response) }
     end
   end
+
+  def trains
+    @response = {
+      :url => request.url,
+      :params => params.reject{|k,v| ["controller","format","action"].include?(k) },
+      :received_at => Time.zone.now,
+      :errors => [],
+      :results => [
+        {:origin_departure => "10:00am", :destination_arrival => "10:15am"},
+        {:origin_departure => "10:45am", :destination_arrival => "11:01am"},
+        {:origin_departure => "5:05pm", :destination_arrival => "5:21pm"},
+        {:origin_departure => "6:25pm", :destination_arrival => "6:41pm"}
+      ]
+    }
+
+    respond_to do |format|
+      format.json { render json: JSON.pretty_generate(@response) }
+    end
+  end
+
 end

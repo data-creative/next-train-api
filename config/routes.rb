@@ -8,7 +8,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      get '/' => 'api#index'
       get 'stations' => 'api#stations'
+      get 'trains' => 'api#trains'
     end
   end
 
