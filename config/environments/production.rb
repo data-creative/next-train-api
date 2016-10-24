@@ -88,7 +88,9 @@ Rails.application.configure do
   # Configure Devise.
   #
 
-  config.action_mailer.default_url_options = { host: 'next-train-production.herokuapp.com' }
+  config.action_mailer.default_url_options = {
+    host: ENV.fetch('MAILER_HOST_URL', 'next-train-production.herokuapp.com') # set MAILER_HOST_URL on staging to point to staging instead of production
+  }
 
   # Send mail through sendgrid smtp on production.
   config.action_mailer.delivery_method = :smtp
