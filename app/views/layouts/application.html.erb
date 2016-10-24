@@ -9,6 +9,34 @@
   </head>
 
   <body>
+
+    <!-- FLASH MESSAGES -->
+    <p class="notice"><%= notice %></p>
+    <p class="alert"><%= alert %></p>
+
+    <header>
+      <h1><%= link_to "NextTrain", root_path %></h1>
+
+      <% unless developer_signed_in? %>
+      <p>
+        You must be a registered developer with a valid API Key to access the API.
+        <%= link_to "Sign In", new_developer_session_path %>  |
+        <%= link_to "Sign Up", new_developer_registration_path %>
+      </p>
+      <% else %>
+      <p>
+        <%= link_to "Log Out", destroy_developer_session_path, :method => :delete %>
+      </p>
+      <% end %>
+    </header>
+
     <%= yield %>
+
+    <footer style="margin-top:2em;">
+      <p>
+        <a href="https://github.com/s2t2/next-train">Source Code</a>
+      </p>
+    </footer>
+
   </body>
 </html>

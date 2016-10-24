@@ -10,6 +10,7 @@ Install dependencies for a Ruby on Rails application:
  + `bundler`
  + `rails`
  + `mysql`
+ + `mailcatcher`
 
 ### Installation
 

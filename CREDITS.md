@@ -10,3 +10,10 @@
   + https://blog.heroku.com/using-bundler-groups-on-heroku
   + https://devcenter.heroku.com/articles/getting-started-with-rails5
   + https://blog.heroku.com/container_ready_rails_5
+  + https://libertyseeds.ca/2016/07/22/Bootstrapping-a-Rails-5-application-with-Rspec-and-Capybara/
+
+## Authentication
+
+  + https://github.com/plataformatec/devise
+  + https://github.com/lynndylanhurley/devise_token_auth
+  + http://matthughes.io/securing-a-rails-api-with-devise/
