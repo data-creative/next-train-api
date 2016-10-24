@@ -18,6 +18,8 @@ heroku git:remote -a next-train-staging
 git remote rename heroku heroku-staging
 heroku config:set BUNDLE_WITHOUT="development:test:docs" -a next-train-staging
 heroku addons:create cleardb:ignite -a next-train-staging
+heroku addons:create sendgrid:starter -a next-train-staging
+heroku addons:create scheduler:standard -a next-train-staging
 ````
 
 In the console, create a new environment variable called `DATABASE_URL`, and set its value to the same thing as `CLEARDB_DATABASE_URL`, except use `mysql2:` instead of `mysql:`.
@@ -30,6 +32,8 @@ heroku git:remote -a next-train-production
 git remote rename heroku heroku-production
 heroku config:set BUNDLE_WITHOUT="development:test:docs" -a next-train-production
 heroku addons:create cleardb:ignite -a next-train-production
+heroku addons:create sendgrid:starter -a next-train-production
+heroku addons:create scheduler:standard -a next-train-production
 ````
 
 In the console, create a new environment variable called `DATABASE_URL`, and set its value to the same thing as `CLEARDB_DATABASE_URL`, except use `mysql2:` instead of `mysql:`.

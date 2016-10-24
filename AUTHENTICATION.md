@@ -42,11 +42,10 @@ Some setup you must do manually if you haven't yet:
        rails g devise:views
 ````
 
-For mail, use `mailcatcher` in development and `sendgrid` in heroku production:
+Configure email settings, using `mailcatcher` in development and `sendgrid` in heroku production:
 
 ```` rb
 # config/environments/development.rb
-# ...
 
 config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 
@@ -57,7 +56,6 @@ config.action_mailer.smtp_settings = {:address => "localhost", :port => 1025}
 
 ```` rb
 # config/environments/production.rb
-# ...
 
 config.action_mailer.default_url_options = { host: 'next-train-production.herokuapp.com' }
 
@@ -72,6 +70,12 @@ config.action_mailer.smtp_settings = {
  :domain         => 'heroku.com',
  :enable_starttls_auto => true
 }
+````
+
+```` rb
+# config/environments/test.rb
+
+config.action_mailer.default_url_options = { :host => 'localhost' }
 ````
 
 ### Generation
