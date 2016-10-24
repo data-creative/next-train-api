@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe Api::V1::ApiController, type: :controller do
   let(:token){ nil }
   let(:response){
-    #rsp = get :stations, {"format"=>"json", "api_key"=> token}
-    rsp = get :stations, params: {format: 'json', api_key: token} #, session: { user_id: 1 }
+    rsp = get :stations, params: {format: 'json', api_key: token}
+    binding.pry
     JSON.parse(rsp.body)
   }
 
@@ -42,9 +42,8 @@ RSpec.describe Api::V1::ApiController, type: :controller do
   context "when request contains a recognized, unrevoked api key" do
     let(:token){ "ABC-1234-5678-XYZ"}
 
-    it "should not return MissingApiKeyError nor UnrecognizedApiKeyError" do
-      matching_error_messages = response["errors"].select{|str| str.include?("MissingApiKeyError") || str.include?("UnrecognizedApiKeyError")}
-      expect(matching_error_messages).to be_empty
+    it "should not return any errors" do
+      expect(response["errors"]).to be_empty
     end
 
     it "should return results" do
