@@ -17,3 +17,4 @@
   + https://github.com/plataformatec/devise
   + https://github.com/lynndylanhurley/devise_token_auth
   + http://matthughes.io/securing-a-rails-api-with-devise/
+  + https://github.com/plataformatec/devise/wiki/How-To:-Test-with-Capybara

@@ -1,9 +1,7 @@
 FactoryGirl.define do
   factory :developer do
-    email
-    first_name "Tad"
-    last_name "Codey"
-    encrypted_password "MyPass123"
+    sequence(:email){ |n| "tad.codey+#{n}@example.com" }
+    password "MyPass123"
     confirmed_at Time.zone.now
   end
 end
