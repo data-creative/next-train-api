@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   root 'welcome#index'
 
   namespace :api do
-    namespace :v1 do
+    namespace :v0 do # STATIC RESPONSES
       get '/' => 'api#index'
       get 'stations' => 'api#stations'
       get 'trains' => 'api#trains'

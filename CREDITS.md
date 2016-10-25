@@ -18,3 +18,8 @@
   + https://github.com/lynndylanhurley/devise_token_auth
   + http://matthughes.io/securing-a-rails-api-with-devise/
   + https://github.com/plataformatec/devise/wiki/How-To:-Test-with-Capybara
+
+## Rails 5
+
+  + http://eileencodes.com/posts/actioncontroller-parameters-now-returns-an-object-instead-of-a-hash/
+  + http://api.rubyonrails.org/classes/ActionController/StrongParameters.html
