@@ -29,10 +29,15 @@ class Api::V0::ApiController < ApplicationController
     endpoint_params[:date] = Date.today.to_s if endpoint_params[:date].blank?
     initialize_response({:endpoint_params => endpoint_params, :resource => "Trains"})
     @response[:results] = [
-      {:origin_departure => "10:00am", :destination_arrival => "10:15am"},
-      {:origin_departure => "10:45am", :destination_arrival => "11:01am"},
-      {:origin_departure => "5:05pm", :destination_arrival => "5:21pm"},
-      {:origin_departure => "6:25pm", :destination_arrival => "6:41pm"}
+      {:id => 1111, :origin_departure => Time.zone.now - 90.minutes, :destination_arrival => Time.zone.now - 75.minutes},
+      {:id => 3333, :origin_departure => Time.zone.now - 5.minutes, :destination_arrival => Time.zone.now + 10.minutes},
+      {:id => 5555, :origin_departure => Time.zone.now, :destination_arrival => Time.zone.now + 15.minutes},
+      {:id => 7777, :origin_departure => Time.zone.now + 30.seconds, :destination_arrival => Time.zone.now + 16.minutes},
+      {:id => 9999, :origin_departure => Time.zone.now + 90.seconds, :destination_arrival => Time.zone.now + 17.minutes},
+      {:id => 2121, :origin_departure => Time.zone.now + 3.minutes, :destination_arrival => Time.zone.now + 18.minutes},
+      {:id => 5656, :origin_departure => Time.zone.now + 25.minutes, :destination_arrival => Time.zone.now + 40.minutes},
+      {:id => 9797, :origin_departure => Time.zone.now + 45.minutes, :destination_arrival => Time.zone.now + 65.minutes},
+      {:id => 2424, :origin_departure => Time.zone.now + 100.minutes, :destination_arrival => Time.zone.now + 115.minutes},
     ]
 
     respond_to do |format|
