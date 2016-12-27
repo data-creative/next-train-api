@@ -15,7 +15,7 @@ RSpec.describe "Visitor Visits Homepage", type: :feature do
     end
 
     it "should contain a link to the source code" do
-      expect(page).to have_content("Source Code")
+      expect(page).to have_content("source")
     end
   end
 end
