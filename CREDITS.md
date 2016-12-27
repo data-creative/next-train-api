@@ -23,3 +23,7 @@
 
   + http://eileencodes.com/posts/actioncontroller-parameters-now-returns-an-object-instead-of-a-hash/
   + http://api.rubyonrails.org/classes/ActionController/StrongParameters.html
+
+## Heroku
+
+  + https://devcenter.heroku.com/articles/cleardb#using-ssl-with-cleardb-and-rails
