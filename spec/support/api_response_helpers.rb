@@ -14,7 +14,7 @@ module ApiResponseHelpers
   def expect_successful_response
     expect_results
     expect_no_errors
-  end
+  end # deprecate me?
 end
 
 RSpec.configure do |config|

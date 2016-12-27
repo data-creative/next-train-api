@@ -12,6 +12,10 @@ Rails.application.routes.draw do
       get 'stations' => 'api#stations'
       get 'trains' => 'api#trains'
     end
+
+    namespace :v1 do
+      get 'trains' => 'api#trains'
+    end
   end
 
 end
