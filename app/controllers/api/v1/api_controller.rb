@@ -11,32 +11,69 @@ class Api::V1::ApiController < ApplicationController
   # @example GET /api/v1/trains.json?origin=BRN&destination=NHV
   # @example GET /api/v1/trains.json?origin=BRN&destination=NHV&date=2016-12-28
   def trains
-    query = params.permit(:origin, :destination, :date).to_h
 
+    #
     # Assemble initial response
+    #
 
     @response = {
       :endpoint => request.path,
       :response_type => "Trains",
-      :query => query,
+      :query => params.permit(:origin, :destination, :date).to_h,
       :received_at => Time.zone.now,
       :errors => [],
       :results => []
     }
 
+    #
     # Parse request parameters
+    #
 
-    @response[:errors] << "Please specify an origin station abbreviation (e.g. 'BRN')." if query[:origin].blank?
-    @response[:errors] << "Please specify a destination station abbreviation (e.g. 'NHV')." if query[:destination].blank?
-    @response[:errors] << "Please specify a departure date (e.g. '#{Date.today.to_s}')." if query[:date].blank?
+    if @response[:query][:origin].blank?
+      @response[:errors] << "Please specify an origin station abbreviation (e.g. 'BRN')."
+    elsif !station_abbreviation_valid?(@response[:query][:origin])
+      @response[:errors] << "Invalid origin station abbreviation"
+    end
+
+    if @response[:query][:destination].blank?
+      @response[:errors] << "Please specify a destination station abbreviation (e.g. 'NHV')."
+    elsif !station_abbreviation_valid?(@response[:query][:destination])
+      @response[:errors] << "Invalid destination station abbreviation"
+    end
+
+    if @response[:query][:date].blank?
+      @response[:errors] << "Please specify a departure date (e.g. '#{Date.today.to_s}')."
+    elsif !date_valid?(@response[:query][:date])
+      @response[:errors] << "Invalid departure date"
+    end
 
     # Populate results
 
-    #TODO
+    if @response[:errors].empty?
+      # TODO: fetch results from database
+    end
 
     respond_to do |format|
       format.json { render json: JSON.pretty_generate(@response) }
     end
   end
 
+  private
+
+  def date_valid?(date_string)
+    begin
+      Date.parse(date_string)
+      return true
+    rescue ArgumentError
+      return false
+    end
+  end
+
+  def station_abbreviation_valid?(abbrev)
+    station_abbrevs.include?(abbrev)
+  end
+
+  def station_abbrevs
+    ["NHV","ST","BRN","GUIL","MAD","CLIN","WES","OSB","NLC"] #TODO: if possible, populate dynamically without calling the database
+  end
 end
