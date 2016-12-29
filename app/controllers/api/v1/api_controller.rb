@@ -50,7 +50,28 @@ class Api::V1::ApiController < ApplicationController
     # Populate results
 
     if @response[:errors].empty?
-      # TODO: fetch results from database
+      @response[:results] = [
+        {
+          "id": 1111,
+          "origin_departure": "2016-12-27 15:44:47 -0500",
+          "destination_arrival": "2016-12-27 15:59:47 -0500"
+        },
+        {
+          "id": 3333,
+          "origin_departure": "2016-12-27 17:09:47 -0500",
+          "destination_arrival": "2016-12-27 17:24:47 -0500"
+        },
+        {
+          "id": 5555,
+          "origin_departure": "2016-12-27 17:14:47 -0500",
+          "destination_arrival": "2016-12-27 17:29:47 -0500"
+        },
+        {
+          "id": 7777,
+          "origin_departure": "2016-12-27 17:15:17 -0500",
+          "destination_arrival": "2016-12-27 17:30:47 -0500"
+        }
+      ]# TODO: fetch results from database
     end
 
     respond_to do |format|
