@@ -34,6 +34,7 @@ RSpec.describe Api::V1::ApiController, type: :controller do
     end
 
     context "when given valid parameters" do
+      let!(:train){ create(:train)}
       let(:response){  get(:trains, params: {format: 'json', origin: 'BRN', destination: 'ST', date: '2016-12-28'})  }
 
       it "should not contain any error messages" do
@@ -42,10 +43,8 @@ RSpec.describe Api::V1::ApiController, type: :controller do
 
       it "should contain results" do
         expect(parsed_response[:results]).to_not be_blank
-
-        #TODO: expect mock data
-        #expect(parsed_response[:results]).to have_content("5:40")
-        #expect(parsed_response[:results]).to have_content("5:53")
+        expect(parsed_response[:results].first[:origin_departure]).to include("2016-12-28 05:40:00")
+        expect(parsed_response[:results].first[:destination_arrival]).to include("2016-12-28 05:53:00")
       end
     end
   end

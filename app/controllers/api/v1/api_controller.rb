@@ -29,49 +29,36 @@ class Api::V1::ApiController < ApplicationController
     # Parse request parameters
     #
 
-    if @response[:query][:origin].blank?
+    q = @response[:query]
+
+    if q[:origin].blank?
       @response[:errors] << "Please specify an origin station abbreviation (e.g. 'BRN')."
-    elsif !station_abbreviation_valid?(@response[:query][:origin])
+    elsif !station_abbreviation_valid?(q[:origin])
       @response[:errors] << "Invalid origin station abbreviation"
     end
 
-    if @response[:query][:destination].blank?
+    if q[:destination].blank?
       @response[:errors] << "Please specify a destination station abbreviation (e.g. 'NHV')."
-    elsif !station_abbreviation_valid?(@response[:query][:destination])
+    elsif !station_abbreviation_valid?(q[:destination])
       @response[:errors] << "Invalid destination station abbreviation"
     end
 
-    if @response[:query][:date].blank?
+    if q[:date].blank?
       @response[:errors] << "Please specify a departure date (e.g. '#{Date.today.to_s}')."
-    elsif !date_valid?(@response[:query][:date])
+    elsif !date_valid?(q[:date])
       @response[:errors] << "Invalid departure date"
     end
 
     # Populate results
 
     if @response[:errors].empty?
-      @response[:results] = [
+      @response[:results] = Train.departing_on(q[:date]).from_station(q[:origin]).to_station(q[:destination]).map do |train|
         {
-          "id": 1111,
-          "origin_departure": "2016-12-27 15:44:47 -0500",
-          "destination_arrival": "2016-12-27 15:59:47 -0500"
-        },
-        {
-          "id": 3333,
-          "origin_departure": "2016-12-27 17:09:47 -0500",
-          "destination_arrival": "2016-12-27 17:24:47 -0500"
-        },
-        {
-          "id": 5555,
-          "origin_departure": "2016-12-27 17:14:47 -0500",
-          "destination_arrival": "2016-12-27 17:29:47 -0500"
-        },
-        {
-          "id": 7777,
-          "origin_departure": "2016-12-27 17:15:17 -0500",
-          "destination_arrival": "2016-12-27 17:30:47 -0500"
+          id: train.id,
+          origin_departure: train.origin_departure.to_s,
+          destination_arrival: train.destination_arrival.to_s
         }
-      ]# TODO: fetch results from database
+      end
     end
 
     respond_to do |format|
@@ -82,12 +69,8 @@ class Api::V1::ApiController < ApplicationController
   private
 
   def date_valid?(date_string)
-    begin
-      Date.parse(date_string)
-      return true
-    rescue ArgumentError
-      return false
-    end
+    y, m, d = date_string.strip.split("-")
+    Date.valid_date?(y.to_i, m.to_i, d.to_i)
   end
 
   def station_abbreviation_valid?(abbrev)
