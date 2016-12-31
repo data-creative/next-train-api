@@ -16,7 +16,7 @@ RSpec.describe GtfsImport, type: :job do
       }
     }
     let!(:zip_file){ Zip::File.open("./spec/data/mock_google_transit.zip") }
-    let(:schedule){ TransitSchedule.latest }
+    let(:schedule){ Schedule.latest }
 
     before(:each) do
       stub_request(:get, source_url).with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
@@ -33,15 +33,15 @@ RSpec.describe GtfsImport, type: :job do
       expect(schedule.etag).to eql(headers["etag"].first.tr('"',''))
     end
 
-    #it "should persist transit schedule data" do
-    #  expect(Agency.count).to eql(1)
-    #  expect(Calendar.count).to eql(6)
-    #  expect(CalendarDate.count).to eql(34)
-    #  expect(Route.count).to eql(1)
-    #  expect(Stop.count).to eql(17)
-    #  expect(StopTime.count).to eql(520)
-    #  expect(Trip.count).to eql(71)
-    #  #expect(Train.count).to eql(100)
-    #end
+    it "should persist transit schedule data" do
+      expect(Agency.count).to eql(1)
+      #expect(Calendar.count).to eql(6)
+      #expect(CalendarDate.count).to eql(34)
+      #expect(Route.count).to eql(1)
+      #expect(Stop.count).to eql(17)
+      #expect(StopTime.count).to eql(520)
+      #expect(Trip.count).to eql(71)
+      #expect(Train.count).to eql(100)
+    end
   end
 end

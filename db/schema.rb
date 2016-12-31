@@ -10,7 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161231052921) do
+ActiveRecord::Schema.define(version: 20161231151028) do
+
+  create_table "agencies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "schedule_id", null: false
+    t.string   "url",         null: false
+    t.string   "abbrev"
+    t.string   "name",        null: false
+    t.string   "timezone",    null: false
+    t.string   "phone"
+    t.string   "lang"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.index ["abbrev"], name: "index_agencies_on_abbrev", using: :btree
+    t.index ["name"], name: "index_agencies_on_name", using: :btree
+    t.index ["schedule_id", "url"], name: "index_agencies_on_schedule_id_and_url", unique: true, using: :btree
+    t.index ["schedule_id"], name: "index_agencies_on_schedule_id", using: :btree
+    t.index ["url"], name: "index_agencies_on_url", using: :btree
+  end
 
   create_table "developers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email",                  default: "", null: false
@@ -32,6 +49,18 @@ ActiveRecord::Schema.define(version: 20161231052921) do
     t.index ["reset_password_token"], name: "index_developers_on_reset_password_token", unique: true, using: :btree
   end
 
+  create_table "schedules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "source_url",     null: false
+    t.datetime "published_at",   null: false
+    t.integer  "content_length"
+    t.string   "etag"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["published_at"], name: "index_schedules_on_published_at", using: :btree
+    t.index ["source_url", "published_at"], name: "index_schedules_on_source_url_and_published_at", unique: true, using: :btree
+    t.index ["source_url"], name: "index_schedules_on_source_url", using: :btree
+  end
+
   create_table "trains", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "origin"
     t.datetime "origin_departure"
@@ -39,18 +68,6 @@ ActiveRecord::Schema.define(version: 20161231052921) do
     t.datetime "destination_arrival"
     t.datetime "created_at",          null: false
     t.datetime "updated_at",          null: false
-  end
-
-  create_table "transit_schedules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "source_url",     null: false
-    t.datetime "published_at",   null: false
-    t.integer  "content_length"
-    t.string   "etag"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-    t.index ["published_at"], name: "index_transit_schedules_on_published_at", using: :btree
-    t.index ["source_url", "published_at"], name: "index_transit_schedules_on_source_url_and_published_at", unique: true, using: :btree
-    t.index ["source_url"], name: "index_transit_schedules_on_source_url", using: :btree
   end
 
 end
