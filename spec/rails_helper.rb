@@ -9,6 +9,7 @@ require 'support/factory_girl'
 require 'support/warden'
 require 'capybara/rspec'
 require 'capybara/rails'
+require 'webmock/rspec'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -67,4 +68,6 @@ RSpec.configure do |config|
       with.library :rails
     end
   end
+
+  WebMock.disable_net_connect!
 end

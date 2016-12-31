@@ -24,6 +24,7 @@ group :development, :test do
   gem 'factory_girl_rails', '~> 4.0'
   gem 'capybara'
   gem 'shoulda-matchers', '~> 3.1'
+  gem 'webmock'
 end
 
 group :development do
