@@ -19,7 +19,9 @@ RSpec.describe GtfsImport, type: :job do
 
     before(:each) do
       stub_request(:get, source_url).with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
-         to_return(:status => 200, :body => "", :headers => headers)
+         to_return(:status => 200, :body => "xyz", :headers => headers)
+
+      allow(Zip::File).to receive(:open).and_return(Zip::File.open("./spec/data/mock_google_transit.zip"))
 
       described_class.perform(:source_url => source_url)
     end
@@ -27,7 +29,7 @@ RSpec.describe GtfsImport, type: :job do
     it "should persist transit schedule metadata" do
       expect(schedule.published_at.to_datetime).to eql(headers["last-modified"].first.to_datetime)
       expect(schedule.content_length).to eql(headers["content-length"].first.to_i)
-      expect(schedule.etag).to eql(headers["etag"].first.trim('"',''))
+      expect(schedule.etag).to eql(headers["etag"].first.tr('"',''))
     end
 
     it "should persist transit schedule data" do
