@@ -13,6 +13,8 @@ gem 'jbuilder', '~> 2.5'
 #gem 'devise_token_auth'
 #gem 'omniauth' # for future use with devise_token_auth
 gem 'devise'
+gem 'httparty'
+gem 'rubyzip', '>= 1.0.0'
 
 gem 'yard', group: :docs # run `bundle exec yard doc` to parse comments and/or `bundle exec yard server` to view documentation at *localhost:8808*
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161229023524) do
+ActiveRecord::Schema.define(version: 20161231052921) do
 
   create_table "developers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email",                  default: "", null: false
@@ -39,6 +39,18 @@ ActiveRecord::Schema.define(version: 20161229023524) do
     t.datetime "destination_arrival"
     t.datetime "created_at",          null: false
     t.datetime "updated_at",          null: false
+  end
+
+  create_table "transit_schedules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "source_url",     null: false
+    t.datetime "published_at",   null: false
+    t.integer  "content_length"
+    t.string   "etag"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["published_at"], name: "index_transit_schedules_on_published_at", using: :btree
+    t.index ["source_url", "published_at"], name: "index_transit_schedules_on_source_url_and_published_at", unique: true, using: :btree
+    t.index ["source_url"], name: "index_transit_schedules_on_source_url", using: :btree
   end
 
 end
