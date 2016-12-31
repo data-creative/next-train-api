@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161231151028) do
+ActiveRecord::Schema.define(version: 20161231155135) do
 
   create_table "agencies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "schedule_id", null: false
@@ -27,6 +27,27 @@ ActiveRecord::Schema.define(version: 20161231151028) do
     t.index ["schedule_id", "url"], name: "index_agencies_on_schedule_id_and_url", unique: true, using: :btree
     t.index ["schedule_id"], name: "index_agencies_on_schedule_id", using: :btree
     t.index ["url"], name: "index_agencies_on_url", using: :btree
+  end
+
+  create_table "calendars", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "schedule_id", null: false
+    t.string   "service_id"
+    t.boolean  "monday"
+    t.boolean  "tuesday"
+    t.boolean  "wednesday"
+    t.boolean  "thursday"
+    t.boolean  "friday"
+    t.boolean  "saturday"
+    t.boolean  "sunday"
+    t.date     "start_date"
+    t.date     "end_date"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.index ["end_date"], name: "index_calendars_on_end_date", using: :btree
+    t.index ["schedule_id", "service_id"], name: "index_calendars_on_schedule_id_and_service_id", unique: true, using: :btree
+    t.index ["schedule_id"], name: "index_calendars_on_schedule_id", using: :btree
+    t.index ["service_id"], name: "index_calendars_on_service_id", using: :btree
+    t.index ["start_date"], name: "index_calendars_on_start_date", using: :btree
   end
 
   create_table "developers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

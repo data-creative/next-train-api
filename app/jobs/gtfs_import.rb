@@ -23,7 +23,7 @@ class GtfsImport < ApplicationJob
       Zip::File.open(destination_path) do |zip_file|
         @zip_file = zip_file
         parse_agency
-        #parse_calendar
+        parse_calendar
         # etc...
       end
     end
@@ -49,5 +49,32 @@ class GtfsImport < ApplicationJob
     end
   end
 
+  # @see https://developers.google.com/transit/gtfs/reference/calendar-file
+  def self.parse_calendar
+    results = read_file("calendar.txt")
+    CSV.parse(results, :headers => true) do |row|
+      calendar = Calendar.where(:schedule_id => @schedule.id, :service_id => row["service_id"]).first_or_initialize
+      calendar.update({
+        :monday => convert_to_boolean(row["monday"]),
+        :tuesday => convert_to_boolean(row["tuesday"]),
+        :wednesday => convert_to_boolean(row["wednesday"]),
+        :thursday => convert_to_boolean(row["thursday"]),
+        :friday => convert_to_boolean(row["friday"]),
+        :saturday => convert_to_boolean(row["saturday"]),
+        :sunday => convert_to_boolean(row["sunday"]),
+        :start_date => row["start_date"].to_date,
+        :end_date => row["end_date"].to_date
+      })
+    end
+  end
 
+  # @param [String] val a boolean-convertable integer string (e.g. "0" or "1") lolz
+  def self.convert_to_boolean(str)
+    case str
+    when "0"
+      false
+    when "1"
+      true
+    end
+  end
 end

@@ -35,7 +35,7 @@ RSpec.describe GtfsImport, type: :job do
 
     it "should persist transit schedule data" do
       expect(Agency.count).to eql(1)
-      #expect(Calendar.count).to eql(6)
+      expect(Calendar.count).to eql(6)
       #expect(CalendarDate.count).to eql(34)
       #expect(Route.count).to eql(1)
       #expect(Stop.count).to eql(17)

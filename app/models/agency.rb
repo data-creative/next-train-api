@@ -3,4 +3,5 @@ class Agency < ApplicationRecord
 
   validates_associated :schedule
   validates_presence_of :url, :name, :timezone
+  validates :url, :uniqueness => {:scope => :schedule_id}
 end

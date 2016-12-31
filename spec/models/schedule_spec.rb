@@ -1,5 +1,14 @@
 require 'rails_helper'
 
-RSpec.describe Schedule, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+RSpec.describe Schedule, "associations", type: :model do
+  it { should have_many(:agencies) }
+  it { should have_many(:calendars) }
+end
+
+RSpec.describe Schedule, "validations", type: :model do
+  it { should validate_presence_of(:source_url) }
+  it { should validate_presence_of(:published_at) }
+
+  subject { create(:schedule) } # line below needs this to avoid Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::ExistingRecordInvalid. not sure if the expectations above this line are affected...
+  it { should validate_uniqueness_of(:published_at).scoped_to(:source_url) }
 end
