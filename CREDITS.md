@@ -27,3 +27,7 @@
 ## Heroku
 
   + https://devcenter.heroku.com/articles/cleardb#using-ssl-with-cleardb-and-rails
+
+## Testing
+
+  + http://stackoverflow.com/a/41407638/670433
