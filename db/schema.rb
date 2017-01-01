@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161231205640) do
+ActiveRecord::Schema.define(version: 20170101192415) do
 
   create_table "agencies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "schedule_id", null: false
@@ -82,6 +82,25 @@ ActiveRecord::Schema.define(version: 20161231205640) do
     t.index ["confirmation_token"], name: "index_developers_on_confirmation_token", unique: true, using: :btree
     t.index ["email"], name: "index_developers_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_developers_on_reset_password_token", unique: true, using: :btree
+  end
+
+  create_table "routes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "schedule_id",   null: false
+    t.string   "guid",          null: false
+    t.string   "agency_abbrev"
+    t.string   "short_name"
+    t.string   "long_name"
+    t.string   "description"
+    t.integer  "code"
+    t.string   "url"
+    t.string   "color"
+    t.string   "text_color"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.index ["code"], name: "index_routes_on_code", using: :btree
+    t.index ["guid"], name: "index_routes_on_guid", using: :btree
+    t.index ["schedule_id", "guid"], name: "index_routes_on_schedule_id_and_guid", unique: true, using: :btree
+    t.index ["schedule_id"], name: "index_routes_on_schedule_id", using: :btree
   end
 
   create_table "schedules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

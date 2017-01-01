@@ -25,7 +25,10 @@ class GtfsImport < ApplicationJob
         parse_agency
         parse_calendar
         parse_calendar_dates
-        # etc...
+        parse_routes
+        #parse_stops
+        #parse_stop_times
+        #parse_trips
       end
     end
   end
@@ -56,13 +59,13 @@ class GtfsImport < ApplicationJob
     CSV.parse(results, :headers => true) do |row|
       calendar = Calendar.where(:schedule_id => @schedule.id, :service_id => row["service_id"]).first_or_initialize
       calendar.update({
-        :monday => calendar_day_boolean(row["monday"]),
-        :tuesday => calendar_day_boolean(row["tuesday"]),
-        :wednesday => calendar_day_boolean(row["wednesday"]),
-        :thursday => calendar_day_boolean(row["thursday"]),
-        :friday => calendar_day_boolean(row["friday"]),
-        :saturday => calendar_day_boolean(row["saturday"]),
-        :sunday => calendar_day_boolean(row["sunday"]),
+        :monday => parse_bool(row["monday"]),
+        :tuesday => parse_bool(row["tuesday"]),
+        :wednesday => parse_bool(row["wednesday"]),
+        :thursday => parse_bool(row["thursday"]),
+        :friday => parse_bool(row["friday"]),
+        :saturday => parse_bool(row["saturday"]),
+        :sunday => parse_bool(row["sunday"]),
         :start_date => row["start_date"].to_date,
         :end_date => row["end_date"].to_date
       })
@@ -70,13 +73,8 @@ class GtfsImport < ApplicationJob
   end
 
   # @param [String] str a boolean-convertable integer: "0" or "1".
-  def self.calendar_day_boolean(str)
-    case str
-    when "0"
-      false
-    when "1"
-      true
-    end
+  def self.parse_bool(str)
+    case str; when "0"; false; when "1"; true; end
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/calendar_dates-file
@@ -88,12 +86,30 @@ class GtfsImport < ApplicationJob
         :service_id => row["service_id"],
         :exception_date => row["date"].to_date
       }).first_or_initialize
-      calendar_date.update!(:exception_code => calendar_date_exception_code(row["exception_type"]))
+      calendar_date.update!(:exception_code => parse_numeric(row["exception_type"]))
     end
   end
 
-  # @param [String] code an exception code: "1" or "2"
-  def self.calendar_date_exception_code(code)
-    case code; when "1"; 1; when "2"; 2; end
+  # @param [String] str an exception code like "1" or "2"
+  def self.parse_numeric(str)
+    str.to_i unless str.blank?
+  end
+
+  # @see https://developers.google.com/transit/gtfs/reference/routes-file
+  def self.parse_routes
+    results = read_file("routes.txt")
+    CSV.parse(results, :headers => true) do |row|
+      route = Route.where(:schedule_id => @schedule.id, :guid => row["route_id"]).first_or_initialize
+      route.update!({
+        :agency_abbrev => row["agency_id"],
+        :short_name => row["route_short_name"],
+        :long_name => row["route_long_name"],
+        :description => row["route_desc"],
+        :code => parse_numeric(row["route_type"]),
+        :url => row["url"],
+        :color => row["color"],
+        :text_color => row["text_color"],
+      })
+    end
   end
 end

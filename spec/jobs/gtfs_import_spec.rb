@@ -1,6 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe GtfsImport, type: :job do
+  describe "#parse_numeric" do
+    it "should convert a numeric string to an integer" do
+      expect(described_class.parse_numeric("0")).to eql(0)
+    end
+
+    it "should convert a blank value to nil, not zero" do
+      expect(described_class.parse_numeric("")).to eql(nil)
+    end
+  end
+
   describe "#perform" do
     let(:source_url){ "http://www.my-site.com/gtfs-feed.zip"}
     let(:headers){
@@ -37,7 +47,7 @@ RSpec.describe GtfsImport, type: :job do
       expect(Agency.count).to eql(1)
       expect(Calendar.count).to eql(6)
       expect(CalendarDate.count).to eql(34)
-      #expect(Route.count).to eql(1)
+      expect(Route.count).to eql(1)
       #expect(Stop.count).to eql(17)
       #expect(StopTime.count).to eql(520)
       #expect(Trip.count).to eql(71)

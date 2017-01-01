@@ -5,6 +5,7 @@ RSpec.describe CalendarDate, "associations", type: :model do
 end
 
 RSpec.describe CalendarDate, "validations", type: :model do
+  it { should validate_presence_of(:schedule_id)}
   it { should validate_presence_of(:service_id) }
   it { should validate_presence_of(:exception_date) }
   it { should validate_presence_of(:exception_code) }

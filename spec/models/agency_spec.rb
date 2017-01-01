@@ -1,8 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe Agency, "validations", type: :model do
+RSpec.describe Agency, "associations", type: :model do
   it { should belong_to(:schedule) }
+end
 
+RSpec.describe Agency, "validations", type: :model do
+  it { should validate_presence_of(:schedule_id)}
   it { should validate_presence_of(:url) }
   it { should validate_presence_of(:name) }
   it { should validate_presence_of(:timezone) }

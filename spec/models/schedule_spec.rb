@@ -4,6 +4,7 @@ RSpec.describe Schedule, "associations", type: :model do
   it { should have_many(:agencies) }
   it { should have_many(:calendars) }
   it { should have_many(:calendar_dates) }
+  it { should have_many(:routes) }
 end
 
 RSpec.describe Schedule, "validations", type: :model do
