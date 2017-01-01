@@ -31,3 +31,4 @@
 ## Testing
 
   + http://stackoverflow.com/a/41407638/670433
+  + http://www.rubydoc.info/github/thoughtbot/shoulda-matchers/Shoulda/Matchers/ActiveModel#validate_inclusion_of-instance_method

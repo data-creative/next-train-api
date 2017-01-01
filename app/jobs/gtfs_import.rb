@@ -24,6 +24,7 @@ class GtfsImport < ApplicationJob
         @zip_file = zip_file
         parse_agency
         parse_calendar
+        parse_calendar_dates
         # etc...
       end
     end
@@ -55,26 +56,44 @@ class GtfsImport < ApplicationJob
     CSV.parse(results, :headers => true) do |row|
       calendar = Calendar.where(:schedule_id => @schedule.id, :service_id => row["service_id"]).first_or_initialize
       calendar.update({
-        :monday => convert_to_boolean(row["monday"]),
-        :tuesday => convert_to_boolean(row["tuesday"]),
-        :wednesday => convert_to_boolean(row["wednesday"]),
-        :thursday => convert_to_boolean(row["thursday"]),
-        :friday => convert_to_boolean(row["friday"]),
-        :saturday => convert_to_boolean(row["saturday"]),
-        :sunday => convert_to_boolean(row["sunday"]),
+        :monday => calendar_day_boolean(row["monday"]),
+        :tuesday => calendar_day_boolean(row["tuesday"]),
+        :wednesday => calendar_day_boolean(row["wednesday"]),
+        :thursday => calendar_day_boolean(row["thursday"]),
+        :friday => calendar_day_boolean(row["friday"]),
+        :saturday => calendar_day_boolean(row["saturday"]),
+        :sunday => calendar_day_boolean(row["sunday"]),
         :start_date => row["start_date"].to_date,
         :end_date => row["end_date"].to_date
       })
     end
   end
 
-  # @param [String] val a boolean-convertable integer string (e.g. "0" or "1") lolz
-  def self.convert_to_boolean(str)
+  # @param [String] str a boolean-convertable integer: "0" or "1".
+  def self.calendar_day_boolean(str)
     case str
     when "0"
       false
     when "1"
       true
     end
+  end
+
+  # @see https://developers.google.com/transit/gtfs/reference/calendar_dates-file
+  def self.parse_calendar_dates
+    results = read_file("calendar_dates.txt")
+    CSV.parse(results, :headers => true) do |row|
+      calendar_date = CalendarDate.where({
+        :schedule_id => @schedule.id,
+        :service_id => row["service_id"],
+        :exception_date => row["date"].to_date
+      }).first_or_initialize
+      calendar_date.update!(:exception_code => calendar_date_exception_code(row["exception_type"]))
+    end
+  end
+
+  # @param [String] code an exception code: "1" or "2"
+  def self.calendar_date_exception_code(code)
+    case code; when "1"; 1; when "2"; 2; end
   end
 end

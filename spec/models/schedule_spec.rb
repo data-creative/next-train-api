@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Schedule, "associations", type: :model do
   it { should have_many(:agencies) }
   it { should have_many(:calendars) }
+  it { should have_many(:calendar_dates) }
 end
 
 RSpec.describe Schedule, "validations", type: :model do

@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161231155135) do
+ActiveRecord::Schema.define(version: 20161231205640) do
 
   create_table "agencies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "schedule_id", null: false
     t.string   "url",         null: false
     t.string   "abbrev"
-    t.string   "name",        null: false
-    t.string   "timezone",    null: false
+    t.string   "name"
+    t.string   "timezone"
     t.string   "phone"
     t.string   "lang"
     t.datetime "created_at",  null: false
@@ -27,6 +27,20 @@ ActiveRecord::Schema.define(version: 20161231155135) do
     t.index ["schedule_id", "url"], name: "index_agencies_on_schedule_id_and_url", unique: true, using: :btree
     t.index ["schedule_id"], name: "index_agencies_on_schedule_id", using: :btree
     t.index ["url"], name: "index_agencies_on_url", using: :btree
+  end
+
+  create_table "calendar_dates", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "schedule_id",    null: false
+    t.string   "service_id"
+    t.date     "exception_date"
+    t.integer  "exception_code"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["exception_code"], name: "index_calendar_dates_on_exception_code", using: :btree
+    t.index ["exception_date"], name: "index_calendar_dates_on_exception_date", using: :btree
+    t.index ["schedule_id", "service_id", "exception_date"], name: "calendar_dates_ck", unique: true, using: :btree
+    t.index ["schedule_id"], name: "index_calendar_dates_on_schedule_id", using: :btree
+    t.index ["service_id"], name: "index_calendar_dates_on_service_id", using: :btree
   end
 
   create_table "calendars", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
