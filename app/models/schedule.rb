@@ -4,6 +4,7 @@ class Schedule < ApplicationRecord
   has_many :calendar_dates, :inverse_of => :schedule
   has_many :routes, :inverse_of => :schedule
   has_many :stops, :inverse_of => :schedule
+  has_many :stop_times, :inverse_of => :schedule
 
   validates_presence_of :source_url, :published_at
   validates :published_at, :uniqueness => {:scope => :source_url}

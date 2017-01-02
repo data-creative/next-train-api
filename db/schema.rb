@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170101222837) do
+ActiveRecord::Schema.define(version: 20170102182927) do
 
   create_table "agencies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "schedule_id", null: false
@@ -113,6 +113,28 @@ ActiveRecord::Schema.define(version: 20170101222837) do
     t.index ["published_at"], name: "index_schedules_on_published_at", using: :btree
     t.index ["source_url", "published_at"], name: "index_schedules_on_source_url_and_published_at", unique: true, using: :btree
     t.index ["source_url"], name: "index_schedules_on_source_url", using: :btree
+  end
+
+  create_table "stop_times", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "schedule_id",    null: false
+    t.string   "trip_guid",      null: false
+    t.string   "stop_guid",      null: false
+    t.integer  "stop_sequence"
+    t.string   "arrival_time"
+    t.string   "departure_time"
+    t.string   "headsign"
+    t.integer  "pickup_code"
+    t.integer  "dropoff_code"
+    t.integer  "distance"
+    t.integer  "code"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["code"], name: "index_stop_times_on_code", using: :btree
+    t.index ["schedule_id", "trip_guid", "stop_guid"], name: "index_stop_times_on_schedule_id_and_trip_guid_and_stop_guid", unique: true, using: :btree
+    t.index ["schedule_id"], name: "index_stop_times_on_schedule_id", using: :btree
+    t.index ["stop_guid"], name: "index_stop_times_on_stop_guid", using: :btree
+    t.index ["stop_sequence"], name: "index_stop_times_on_stop_sequence", using: :btree
+    t.index ["trip_guid"], name: "index_stop_times_on_trip_guid", using: :btree
   end
 
   create_table "stops", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

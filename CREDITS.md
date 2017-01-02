@@ -38,4 +38,14 @@
 
 ## GIS
 
-  + https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude#
+  + https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude
+  + https://en.wikipedia.org/wiki/Decimal_degrees
+
+## ActiveRecord
+
+  + http://apidock.com/rails/ActiveRecord/Associations/ClassMethods/belongs_to
+
+## Shore Line East GTFS
+
+  + https://twitter.com/s2t2/status/816031995209850880
+  + https://gist.github.com/s2t2/0d2929e0ecaba85823e1314935e7941e

@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Stop, "association", type: :model do
   it { should belong_to(:schedule) }
+  it { should have_many(:stop_times) }
 end
 
 RSpec.describe Stop, "validations", type: :model do
@@ -27,7 +28,7 @@ RSpec.describe Stop, "#location_classification", type: :model do
 end
 
 RSpec.describe Stop, "#wheelchair_boarding", type: :model do
-  let!(:stop){ create(:stop, :wheelchair_code => 1)}
+  let!(:stop){ create(:stop, :wheelchair_code => nil)}
   let(:parented_stop){ create(:parented_stop, :wheelchair_code => nil)}
 
   it "treats a blank wheelchair_code as code '0'" do

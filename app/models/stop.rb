@@ -1,5 +1,6 @@
 class Stop < ApplicationRecord
   belongs_to :schedule, :inverse_of => :stops
+  has_many :stop_times, :inverse_of => :stop, :primary_key => :guid, :foreign_key => :stop_guid
 
   validates_associated :schedule
   validates_presence_of :schedule_id, :guid, :name, :latitude, :longitude

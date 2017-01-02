@@ -6,6 +6,7 @@ RSpec.describe Schedule, "associations", type: :model do
   it { should have_many(:calendar_dates) }
   it { should have_many(:routes) }
   it { should have_many(:stops) }
+  it { should have_many(:stop_times) }
 end
 
 RSpec.describe Schedule, "validations", type: :model do
