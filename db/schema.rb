@@ -10,19 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170101192415) do
+ActiveRecord::Schema.define(version: 20170101222837) do
 
   create_table "agencies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "schedule_id", null: false
     t.string   "url",         null: false
-    t.string   "abbrev"
+    t.string   "guid"
     t.string   "name"
     t.string   "timezone"
     t.string   "phone"
     t.string   "lang"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
-    t.index ["abbrev"], name: "index_agencies_on_abbrev", using: :btree
+    t.index ["guid"], name: "index_agencies_on_guid", using: :btree
     t.index ["name"], name: "index_agencies_on_name", using: :btree
     t.index ["schedule_id", "url"], name: "index_agencies_on_schedule_id_and_url", unique: true, using: :btree
     t.index ["schedule_id"], name: "index_agencies_on_schedule_id", using: :btree
@@ -85,9 +85,9 @@ ActiveRecord::Schema.define(version: 20170101192415) do
   end
 
   create_table "routes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer  "schedule_id",   null: false
-    t.string   "guid",          null: false
-    t.string   "agency_abbrev"
+    t.integer  "schedule_id", null: false
+    t.string   "guid",        null: false
+    t.string   "agency_guid"
     t.string   "short_name"
     t.string   "long_name"
     t.string   "description"
@@ -95,8 +95,8 @@ ActiveRecord::Schema.define(version: 20170101192415) do
     t.string   "url"
     t.string   "color"
     t.string   "text_color"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
     t.index ["code"], name: "index_routes_on_code", using: :btree
     t.index ["guid"], name: "index_routes_on_guid", using: :btree
     t.index ["schedule_id", "guid"], name: "index_routes_on_schedule_id_and_guid", unique: true, using: :btree
@@ -113,6 +113,31 @@ ActiveRecord::Schema.define(version: 20170101192415) do
     t.index ["published_at"], name: "index_schedules_on_published_at", using: :btree
     t.index ["source_url", "published_at"], name: "index_schedules_on_source_url_and_published_at", unique: true, using: :btree
     t.index ["source_url"], name: "index_schedules_on_source_url", using: :btree
+  end
+
+  create_table "stops", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "schedule_id",                              null: false
+    t.string   "guid",                                     null: false
+    t.string   "short_name"
+    t.string   "name"
+    t.string   "description"
+    t.decimal  "latitude",        precision: 10, scale: 8
+    t.decimal  "longitude",       precision: 11, scale: 8
+    t.string   "zone_guid"
+    t.string   "url"
+    t.integer  "location_code"
+    t.string   "parent_guid"
+    t.string   "timezone"
+    t.integer  "wheelchair_code"
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.index ["guid"], name: "index_stops_on_guid", using: :btree
+    t.index ["location_code"], name: "index_stops_on_location_code", using: :btree
+    t.index ["parent_guid"], name: "index_stops_on_parent_guid", using: :btree
+    t.index ["schedule_id", "guid"], name: "index_stops_on_schedule_id_and_guid", unique: true, using: :btree
+    t.index ["schedule_id"], name: "index_stops_on_schedule_id", using: :btree
+    t.index ["wheelchair_code"], name: "index_stops_on_wheelchair_code", using: :btree
+    t.index ["zone_guid"], name: "index_stops_on_zone_guid", using: :btree
   end
 
   create_table "trains", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

@@ -12,4 +12,5 @@ RSpec.describe Agency, "validations", type: :model do
 
   subject { create(:agency) } # line below needs this to avoid Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::ExistingRecordInvalid. not sure if the expectations above this line are affected...
   it { should validate_uniqueness_of(:url).scoped_to(:schedule_id) }
+  it { should validate_uniqueness_of(:guid).scoped_to(:schedule_id) }
 end

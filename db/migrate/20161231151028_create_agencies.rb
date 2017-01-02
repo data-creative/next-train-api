@@ -4,7 +4,7 @@ class CreateAgencies < ActiveRecord::Migration[5.0]
       t.integer :schedule_id, :null => false
       t.string :url, :null => false
 
-      t.string :abbrev
+      t.string :guid
       t.string :name #, :null => false ... enforce via model validation instead
       t.string :timezone #, :null => false ... enforce via model validation instead
       t.string :phone
@@ -17,7 +17,7 @@ class CreateAgencies < ActiveRecord::Migration[5.0]
     add_index :agencies, :schedule_id
     add_index :agencies, :url
 
-    add_index :agencies, :abbrev
+    add_index :agencies, :guid
     add_index :agencies, :name
   end
 end

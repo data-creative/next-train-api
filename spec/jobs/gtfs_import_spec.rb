@@ -3,11 +3,18 @@ require 'rails_helper'
 RSpec.describe GtfsImport, type: :job do
   describe "#parse_numeric" do
     it "should convert a numeric string to an integer" do
-      expect(described_class.parse_numeric("0")).to eql(0)
+      expect(described_class.new.parse_numeric("0")).to eql(0)
     end
 
     it "should convert a blank value to nil, not zero" do
-      expect(described_class.parse_numeric("")).to eql(nil)
+      expect(described_class.new.parse_numeric("")).to eql(nil)
+    end
+  end
+
+  describe "#parse_decimal" do
+    # @see https://en.wikipedia.org/wiki/Decimal_degrees
+    it "should retain 8 decimal places" do
+      expect(described_class.new.parse_decimal(" -72.92673110961914")).to eql(-72.92673111)
     end
   end
 
@@ -27,6 +34,7 @@ RSpec.describe GtfsImport, type: :job do
     }
     let!(:zip_file){ Zip::File.open("./spec/data/mock_google_transit.zip") }
     let(:schedule){ Schedule.latest }
+    let(:new_haven_union_station){ Stop.find_by_guid("NHV") }
 
     before(:each) do
       stub_request(:get, source_url).with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
@@ -34,7 +42,7 @@ RSpec.describe GtfsImport, type: :job do
 
       allow(Zip::File).to receive(:open){ |&block| block.call(zip_file) }
 
-      described_class.perform(:source_url => source_url)
+      described_class.new(:source_url => source_url).perform
     end
 
     it "should persist transit schedule metadata" do
@@ -48,10 +56,16 @@ RSpec.describe GtfsImport, type: :job do
       expect(Calendar.count).to eql(6)
       expect(CalendarDate.count).to eql(34)
       expect(Route.count).to eql(1)
-      #expect(Stop.count).to eql(17)
+      expect(Stop.count).to eql(17)
       #expect(StopTime.count).to eql(520)
       #expect(Trip.count).to eql(71)
       #expect(Train.count).to eql(100)
     end
+
+    it "should persist stop latitude and longitude to 8 decimal places" do
+      expect(new_haven_union_station.latitude.to_f).to eql(41.29771887)
+      expect(new_haven_union_station.longitude.to_f).to eql(-72.92673111)
+    end
   end
+
 end

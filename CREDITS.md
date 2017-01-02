@@ -32,3 +32,8 @@
 
   + http://stackoverflow.com/a/41407638/670433
   + http://www.rubydoc.info/github/thoughtbot/shoulda-matchers/Shoulda/Matchers/ActiveModel#validate_inclusion_of-instance_method
+  + https://github.com/thoughtbot/shoulda-matchers/blob/master/lib/shoulda/matchers/active_model/validate_inclusion_of_matcher.rb
+
+## GIS
+
+  + https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude#
