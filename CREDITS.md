@@ -33,6 +33,8 @@
   + http://stackoverflow.com/a/41407638/670433
   + http://www.rubydoc.info/github/thoughtbot/shoulda-matchers/Shoulda/Matchers/ActiveModel#validate_inclusion_of-instance_method
   + https://github.com/thoughtbot/shoulda-matchers/blob/master/lib/shoulda/matchers/active_model/validate_inclusion_of_matcher.rb
+  + http://stackoverflow.com/questions/2410639/best-way-to-create-random-datetime-in-rails
+  + https://github.com/thoughtbot/factory_girl/blob/master/GETTING_STARTED.md
 
 ## GIS
 

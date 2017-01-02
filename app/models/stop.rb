@@ -8,11 +8,34 @@ class Stop < ApplicationRecord
   validates :guid, :uniqueness => {:scope => :schedule_id}
 
   LOCATION_CLASSIFICATIONS = {
-    0 => {name:"Tram, Streetcar, Light rail", description:"Any light rail or street level system within a metropolitan area."},
-    1 => {name:"Subway, Metro", description:"Any underground rail system within a metropolitan area."}
+    0 => {name:"Stop", description:"A location where passengers board or disembark from a transit vehicle."},
+    1 => {name:"Station", description:"A physical structure or area that contains one or more stop."}
   }
 
   def location_classification
-    LOCATION_CLASSIFICATIONS[location_code]
+    location_code.blank? ? LOCATION_CLASSIFICATIONS[0] : LOCATION_CLASSIFICATIONS[location_code]
+  end
+
+  WHEELCHAIR_CLASSIFICATIONS = {
+    0 => {
+      :nonparented => "Indicates that there is no accessibility information for the stop.",
+      :parented => "The stop will inherit its wheelchair_boarding value from the parent station, if specified in the parent."
+    },
+    1 => {
+      :nonparented => "Indicates that at least some vehicles at this stop can be boarded by a rider in a wheelchair.",
+      :parented => "There exists some accessible path from outside the station to the specific stop / platform."
+    },
+    2 => {
+      :nonparented => "Wheelchair boarding is not possible at this stop.",
+      :parented => "There exists no accessible path from outside the station to the specific stop/platform."
+    }
+  }
+
+  def wheelchair_boarding
+    if parent_guid.blank?
+      wheelchair_code.blank? ? WHEELCHAIR_CLASSIFICATIONS[0][:nonparented] : WHEELCHAIR_CLASSIFICATIONS[wheelchair_code][:nonparented]
+    else
+      wheelchair_code.blank? ? WHEELCHAIR_CLASSIFICATIONS[0][:parented] : WHEELCHAIR_CLASSIFICATIONS[wheelchair_code][:parented]
+    end
   end
 end
