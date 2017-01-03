@@ -4,7 +4,7 @@ class CalendarDate < ApplicationRecord
   validates_associated :schedule
   validates_presence_of :schedule_id, :service_id, :exception_date, :exception_code
   validates_inclusion_of :exception_code, :in => [1,2]
-  validates :exception_date, :uniqueness => {:scope => [:schedule_id, :service_id]}
+  validates_uniqueness_of :exception_date, :scope => [:schedule_id, :service_id]
 
   def exception_type
     case exception_code; when 1; "Addition"; when 2; "Removal"; end

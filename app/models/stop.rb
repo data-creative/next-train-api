@@ -6,7 +6,7 @@ class Stop < ApplicationRecord
   validates_presence_of :schedule_id, :guid, :name, :latitude, :longitude
   validates_inclusion_of :location_code, :in => [0,1], :allow_nil => true
   validates_inclusion_of :wheelchair_code, :in => [0,1,2], :allow_nil => true
-  validates :guid, :uniqueness => {:scope => :schedule_id}
+  validates_uniqueness_of :guid, :scope => :schedule_id
 
   LOCATION_CLASSIFICATIONS = {
     0 => {name:"Stop", description:"A location where passengers board or disembark from a transit vehicle."},

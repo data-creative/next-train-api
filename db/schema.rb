@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170102182927) do
+ActiveRecord::Schema.define(version: 20170103002208) do
 
   create_table "agencies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "schedule_id", null: false
@@ -169,6 +169,26 @@ ActiveRecord::Schema.define(version: 20170102182927) do
     t.datetime "destination_arrival"
     t.datetime "created_at",          null: false
     t.datetime "updated_at",          null: false
+  end
+
+  create_table "trips", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "schedule_id",     null: false
+    t.string   "guid",            null: false
+    t.string   "route_guid"
+    t.string   "service_guid"
+    t.string   "headsign"
+    t.string   "short_name"
+    t.integer  "direction_code"
+    t.string   "block_guid"
+    t.string   "shape_guid"
+    t.integer  "wheelchair_code"
+    t.integer  "bicycle_code"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.index ["direction_code"], name: "index_trips_on_direction_code", using: :btree
+    t.index ["guid"], name: "index_trips_on_guid", using: :btree
+    t.index ["schedule_id", "guid"], name: "index_trips_on_schedule_id_and_guid", unique: true, using: :btree
+    t.index ["schedule_id"], name: "index_trips_on_schedule_id", using: :btree
   end
 
 end

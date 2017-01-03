@@ -41,7 +41,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     expect(Route.count).to eql(1)
     expect(Stop.count).to eql(17)
     expect(StopTime.count).to eql(515) # expect(StopTime.count).to eql(520)
-    #expect(Trip.count).to eql(71)
+    expect(Trip.count).to eql(71)
 
     # derivations:
     #expect(Train.count).to eql(100)

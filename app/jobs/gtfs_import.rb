@@ -32,8 +32,8 @@ class GtfsImport < ApplicationJob
         parse_calendar_dates
         parse_routes
         parse_stops
-        #parse_trips
-        parse_stop_times # depends on successful completion of #parse_stops and #parse_trips
+        parse_trips
+        parse_stop_times #NOTE: depends on successful completion of #parse_stops and #parse_trips
       end
     end
   end
@@ -142,6 +142,25 @@ class GtfsImport < ApplicationJob
         :parent_guid => row["parent_station"],
         :timezone => row["stop_timezone"],
         :wheelchair_code => parse_numeric(row["wheelchair_boarding"])
+      })
+    end
+  end
+
+  # @see https://developers.google.com/transit/gtfs/reference/trips-file
+  def parse_trips
+    results = read_file("trips.txt")
+    CSV.parse(results, :headers => true) do |row|
+      trip = Trip.where(:schedule_id => @schedule.id, :guid => row["trip_id"]).first_or_initialize
+      trip.update!({
+        :route_guid => row["route_id"],
+        :service_guid => row["service_id"],
+        :headsign => row["trip_headsign"],
+        :short_name => row["trip_short_name"],
+        :direction_code => parse_numeric(row["direction_id"]),
+        :block_guid => row["block_id"],
+        :shape_guid => row["shape_id"],
+        :wheelchair_code => parse_numeric(row["wheelchair_accessible"]),
+        :bicycle_code => parse_numeric(row["bikes_allowed"])
       })
     end
   end

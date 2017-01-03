@@ -1,10 +1,11 @@
 class Route < ApplicationRecord
   belongs_to :schedule, :inverse_of => :routes
+  has_many :trips, :inverse_of => :route, :primary_key => :guid, :foreign_key => :route_guid
 
   validates_associated :schedule
   validates_presence_of :schedule_id, :guid, :short_name, :long_name, :code
   validates_inclusion_of :code, :in => (0..7).to_a
-  validates :guid, :uniqueness => {:scope => :schedule_id}
+  validates_uniqueness_of :guid, :scope => :schedule_id
 
   CLASSIFICATIONS = {
     0 => {name:"Tram, Streetcar, Light rail", description:"Any light rail or street level system within a metropolitan area."},

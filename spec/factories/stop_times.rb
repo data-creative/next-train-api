@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :stop_time do
     schedule
-    trip_guid "1600"
+    trip
     stop
     stop_sequence 23
     arrival_time "5:30:00"
