@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :calendar_date do
     schedule
-    service_id "D0"
+    service_guid "D0"
     exception_date "2016-12-31"
     exception_code 2
   end

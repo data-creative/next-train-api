@@ -2,7 +2,7 @@ class CreateCalendars < ActiveRecord::Migration[5.0]
   def change
     create_table :calendars do |t|
       t.integer :schedule_id, :null => false
-      t.string :service_id
+      t.string :service_guid, :null => false
       t.boolean :monday
       t.boolean :tuesday
       t.boolean :wednesday
@@ -16,9 +16,9 @@ class CreateCalendars < ActiveRecord::Migration[5.0]
       t.timestamps
     end
 
-    add_index :calendars, [:schedule_id, :service_id], :unique => true
+    add_index :calendars, [:schedule_id, :service_guid], :unique => true
     add_index :calendars, :schedule_id
-    add_index :calendars, :service_id
+    add_index :calendars, :service_guid
     add_index :calendars, :start_date
     add_index :calendars, :end_date
   end

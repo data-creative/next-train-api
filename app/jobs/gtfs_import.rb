@@ -79,7 +79,7 @@ class GtfsImport < ApplicationJob
   def parse_calendar
     results = read_file("calendar.txt")
     CSV.parse(results, :headers => true) do |row|
-      calendar = Calendar.where(:schedule_id => @schedule.id, :service_id => row["service_id"]).first_or_initialize
+      calendar = Calendar.where(:schedule_id => @schedule.id, :service_guid => row["service_id"]).first_or_initialize
       calendar.update({
         :monday => parse_bool(row["monday"]),
         :tuesday => parse_bool(row["tuesday"]),
@@ -100,7 +100,7 @@ class GtfsImport < ApplicationJob
     CSV.parse(results, :headers => true) do |row|
       calendar_date = CalendarDate.where({
         :schedule_id => @schedule.id,
-        :service_id => row["service_id"],
+        :service_guid => row["service_id"],
         :exception_date => row["date"].to_date
       }).first_or_initialize
       calendar_date.update!(:exception_code => parse_numeric(row["exception_type"]))

@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :calendar do
     schedule
-    service_id "WD"
+    service_guid "WD"
     monday true
     tuesday true
     wednesday true
