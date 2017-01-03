@@ -104,12 +104,14 @@ ActiveRecord::Schema.define(version: 20170103002208) do
   end
 
   create_table "schedules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "source_url",     null: false
-    t.datetime "published_at",   null: false
+    t.string   "source_url",                     null: false
+    t.datetime "published_at",                   null: false
     t.integer  "content_length"
     t.string   "etag"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.boolean  "active",         default: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.index ["active"], name: "index_schedules_on_active", using: :btree
     t.index ["published_at"], name: "index_schedules_on_published_at", using: :btree
     t.index ["source_url", "published_at"], name: "index_schedules_on_source_url_and_published_at", unique: true, using: :btree
     t.index ["source_url"], name: "index_schedules_on_source_url", using: :btree

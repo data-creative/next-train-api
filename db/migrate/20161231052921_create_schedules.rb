@@ -5,6 +5,7 @@ class CreateSchedules < ActiveRecord::Migration[5.0]
       t.datetime :published_at, :null => false
       t.integer :content_length
       t.string :etag
+      t.boolean :active, :default => false
 
       t.timestamps
     end
@@ -12,5 +13,6 @@ class CreateSchedules < ActiveRecord::Migration[5.0]
     add_index :schedules, [:source_url, :published_at], :unique => true
     add_index :schedules, :source_url
     add_index :schedules, :published_at
+    add_index :schedules, :active
   end
 end

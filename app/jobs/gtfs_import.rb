@@ -4,39 +4,100 @@ require 'zip'
 class GtfsImport < ApplicationJob
   queue_as :default
 
+  # @param [Hash] options
+  # @param [Hash] options [String] source_url Points to a hosted source of transit data in GTFS format (e.g. 'http://my-site.com/gtfs/some_feed.zip').
+  # @param [Hash] options [String] destination_path Specifies where the data should be forcibly downloaded before it is loaded into the database.
   def initialize(options = {})
-    @source_url = options[:source_url] || "http://www.shorelineeast.com/google_transit.zip"
+    @source_url = options[:source_url] || ENV.fetch('GTFS_SOURCE_URL', nil) || "http://www.shorelineeast.com/google_transit.zip"
     @destination_path = options[:destination_path] || "./tmp/google_transit.zip"
   end
 
   def perform
-    system_schedule = Schedule.latest
-
-    response = HTTParty.get(@source_url)
-    headers = response.headers.to_h
-
-    @schedule = Schedule.where(:source_url => @source_url, :published_at => headers["last-modified"].first.to_datetime).first_or_create!
-    @schedule.update!(:content_length => headers["content-length"].first.to_i, :etag => headers["etag"].first.tr('"',''))
-
-    if @schedule != system_schedule
-      FileUtils.rm_rf(@destination_path)
-
-      File.open(@destination_path, "wb") do |zip_file|
-        zip_file.write(response.body)
-      end
-
-      Zip::File.open(@destination_path) do |zip_file|
-        @zip_file = zip_file
-        parse_agency # GtfsImport::AgencyParse.new(zip_file).perform
-        parse_calendar # GtfsImport::CalendarParse.new(zip_file).perform
-        parse_calendar_dates
-        parse_routes
-        parse_stops
-        parse_trips
-        parse_stop_times #NOTE: depends on successful completion of #parse_stops and #parse_trips
-      end
+    if hosted_schedule != active_schedule
+      transform_and_load
+      #derive
+      activate
     end
   end
+
+  private
+
+  def active_schedule
+    Schedule.active
+  end
+
+  def hosted_schedule
+    @schedule ||= Schedule.where({
+      :source_url => @source_url,
+      :published_at => headers["last-modified"].first.to_datetime,
+      :content_length => headers["content-length"].first.to_i,
+      :etag => headers["etag"].first.tr('"','')
+    }).first_or_create!
+  end
+
+  def response
+    @response ||= HTTParty.get(@source_url)
+  end
+
+  def headers
+    response.headers.to_h
+  end
+
+  def transform_and_load
+    FileUtils.rm_rf(@destination_path)
+
+    File.open(@destination_path, "wb") do |zip_file|
+      zip_file.write(response.body)
+    end
+
+    Zip::File.open(@destination_path) do |zip_file|
+      parse_agency(zip_file) # GtfsImport::AgencyImport.new(zip_file).perform
+      parse_calendar(zip_file) # GtfsImport::CalendarImport.new(zip_file).perform
+      parse_calendar_dates(zip_file)
+      parse_routes(zip_file)
+      parse_stops(zip_file)
+      parse_trips(zip_file)
+      parse_stop_times(zip_file) #NOTE: depends on successful completion of #parse_stops and #parse_trips
+    end
+  end
+
+  def activate
+    @schedule.activate!
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   # @param [String] str An exception code (e.g. "1", "2", or "1014")
   def parse_numeric(str)
@@ -53,16 +114,33 @@ class GtfsImport < ApplicationJob
     str.strip.to_f.round(8)
   end
 
-  private
-
-  def read_file(entry_name)
-    entry = @zip_file.entries.find{|entry| entry.name == entry_name }
+  def read_file(zip_file, entry_name)
+    entry = zip_file.entries.find{|entry| entry.name == entry_name }
     return entry.get_input_stream.read
   end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   # @see https://developers.google.com/transit/gtfs/reference/agency-file
-  def parse_agency
-    results = read_file("agency.txt")
+  def parse_agency(zip_file)
+    results = read_file(zip_file, "agency.txt")
     CSV.parse(results, :headers => true) do |row|
       agency = Agency.where(:schedule_id => @schedule.id, :url => row["agency_url"]).first_or_initialize
       agency.update!({
@@ -76,8 +154,8 @@ class GtfsImport < ApplicationJob
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/calendar-file
-  def parse_calendar
-    results = read_file("calendar.txt")
+  def parse_calendar(zip_file)
+    results = read_file(zip_file, "calendar.txt")
     CSV.parse(results, :headers => true) do |row|
       calendar = Calendar.where(:schedule_id => @schedule.id, :service_guid => row["service_id"]).first_or_initialize
       calendar.update({
@@ -95,8 +173,8 @@ class GtfsImport < ApplicationJob
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/calendar_dates-file
-  def parse_calendar_dates
-    results = read_file("calendar_dates.txt")
+  def parse_calendar_dates(zip_file)
+    results = read_file(zip_file, "calendar_dates.txt")
     CSV.parse(results, :headers => true) do |row|
       calendar_date = CalendarDate.where({
         :schedule_id => @schedule.id,
@@ -108,8 +186,8 @@ class GtfsImport < ApplicationJob
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/routes-file
-  def parse_routes
-    results = read_file("routes.txt")
+  def parse_routes(zip_file)
+    results = read_file(zip_file, "routes.txt")
     CSV.parse(results, :headers => true) do |row|
       route = Route.where(:schedule_id => @schedule.id, :guid => row["route_id"]).first_or_initialize
       route.update!({
@@ -126,8 +204,8 @@ class GtfsImport < ApplicationJob
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/stops-file
-  def parse_stops
-    results = read_file("stops.txt")
+  def parse_stops(zip_file)
+    results = read_file(zip_file, "stops.txt")
     CSV.parse(results, :headers => true) do |row|
       stop = Stop.where(:schedule_id => @schedule.id, :guid => row["stop_id"]).first_or_initialize
       stop.update!({
@@ -147,8 +225,8 @@ class GtfsImport < ApplicationJob
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/trips-file
-  def parse_trips
-    results = read_file("trips.txt")
+  def parse_trips(zip_file)
+    results = read_file(zip_file, "trips.txt")
     CSV.parse(results, :headers => true) do |row|
       trip = Trip.where(:schedule_id => @schedule.id, :guid => row["trip_id"]).first_or_initialize
       trip.update!({
@@ -166,8 +244,8 @@ class GtfsImport < ApplicationJob
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/stop_times-file
-  def parse_stop_times
-    results = read_file("stop_times.txt")
+  def parse_stop_times(zip_file)
+    results = read_file(zip_file, "stop_times.txt")
     CSV.parse(results, :headers => true) do |row|
       stop_time = StopTime.where({
         :schedule_id => @schedule.id,
@@ -196,5 +274,16 @@ class GtfsImport < ApplicationJob
     end
   end
   class UnexpectedStopTime < StandardError ; end
+
+
+
+
+
+
+
+
+
+
+
 
 end
