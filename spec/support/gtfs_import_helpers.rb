@@ -12,6 +12,18 @@ module GtfsImportHelpers
     }
   end
 
+  def last_modified_at
+    headers["last-modified"].first.to_datetime
+  end
+
+  def content_length
+    headers["content-length"].first.to_i
+  end
+
+  def etag
+    headers["etag"].first.tr('"','')
+  end
+
   def stub_download_zip(source_url)
     stub_request(:get, source_url).with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
        to_return(:status => 200, :body => "xyz", :headers => headers)
