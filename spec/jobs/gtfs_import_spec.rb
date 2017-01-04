@@ -61,10 +61,6 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       expect(imported_stop.longitude.to_f).to eql(-72.92673111)
     end
 
-    #it "should persist transit schedule data derivations" do
-    #  expect(Train.count).to eql(100)
-    #end
-
     it "should mark the imported schedule as active" do
       expect(imported_schedule.active?).to eql(true)
     end

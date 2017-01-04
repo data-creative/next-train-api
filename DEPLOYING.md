@@ -59,3 +59,11 @@ Deploy from a different branch:
 git push heroku-staging my-branch:master
 git push heroku-production my-branch:master
 ````
+
+## Scheduled Jobs
+
+Both production and staging environment should schedule the following tasks:
+
+task | frequency
+--- | ---
+`rake gtfs:import` | once per hour

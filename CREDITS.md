@@ -35,6 +35,8 @@
   + https://github.com/thoughtbot/shoulda-matchers/blob/master/lib/shoulda/matchers/active_model/validate_inclusion_of_matcher.rb
   + http://stackoverflow.com/questions/2410639/best-way-to-create-random-datetime-in-rails
   + https://github.com/thoughtbot/factory_girl/blob/master/GETTING_STARTED.md
+  + https://blog.pivotal.io/labs/labs/how-i-test-rake-tasks
+  + https://www.relishapp.com/rspec/rspec-mocks/v/2-14/docs/message-expectations/expect-a-message-on-any-instance-of-a-class!
 
 ## GIS
 

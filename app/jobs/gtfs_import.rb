@@ -15,7 +15,6 @@ class GtfsImport < ApplicationJob
   def perform
     if hosted_schedule != active_schedule
       transform_and_load
-      #derive
       activate
     end
   end

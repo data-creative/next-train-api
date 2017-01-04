@@ -49,6 +49,7 @@ Populate database:
 
 ```` sh
 bundle exec rake db:seed
+bundle exec rake gtfs:import
 ````
 
 ### Webserver
