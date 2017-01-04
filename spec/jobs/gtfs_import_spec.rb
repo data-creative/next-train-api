@@ -49,12 +49,12 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     it "should persist transit schedule data" do
       expect(Agency.count).to eql(1)
       expect(Calendar.count).to eql(6)
-      expect(CalendarDate.count).to eql(34)
+      expect(CalendarDate.count).to eql(8)
       expect(Route.count).to eql(1)
       expect(Stop.count).to eql(17)
-      expect(StopTime.count).to eql(515) # expect(StopTime.count).to eql(520)
-      expect(Trip.count).to eql(71)
-    end #TODO: remove records from the files to hasten tests
+      expect(StopTime.count).to eql(120) # there are two duplicates else use ... expect(StopTime.count).to eql(122)
+      expect(Trip.count).to eql(14)
+    end
 
     it "should persist stop latitude and longitude to 8 decimal places" do
       expect(imported_stop.latitude.to_f).to eql(41.29771887)
