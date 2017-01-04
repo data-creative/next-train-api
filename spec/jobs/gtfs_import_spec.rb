@@ -52,7 +52,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       expect(CalendarDate.count).to eql(8)
       expect(Route.count).to eql(1)
       expect(Stop.count).to eql(17)
-      expect(StopTime.count).to eql(120) # there are two duplicates else use ... expect(StopTime.count).to eql(122)
+      expect(StopTime.count).to eql(120) # there are two known duplicates, else would be 122
       expect(Trip.count).to eql(14)
     end
 
@@ -61,7 +61,9 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       expect(imported_stop.longitude.to_f).to eql(-72.92673111)
     end
 
-    pending "should persist transit schedule data derivations" #expect(Train.count).to eql(100)
+    #it "should persist transit schedule data derivations" do
+    #  expect(Train.count).to eql(100)
+    #end
 
     it "should mark the imported schedule as active" do
       expect(imported_schedule.active?).to eql(true)

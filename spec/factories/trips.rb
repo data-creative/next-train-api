@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :trip do
     schedule
-    guid "16hundred" #"1600" #NOTE: using "1600" triggers Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::NonCaseSwappableValueError
+    guid "16hundred" #NOTE: "1600" triggers Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::NonCaseSwappableValueError
     route
     service_guid "WD"
     headsign "Eastbound"

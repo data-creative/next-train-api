@@ -17,6 +17,6 @@ FactoryGirl.define do
       after(:create) do |recently_created_stop, evaluator|
         create(:stop, guid: recently_created_stop.parent_guid)
       end
-    end # this is throwing "Validation failed: Published at has already been taken" because it's trying to create another schedule and the schedule factory does not have a variable
+    end
   end
 end
