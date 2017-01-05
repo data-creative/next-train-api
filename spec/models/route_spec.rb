@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Route, "association", type: :model do
   it { should belong_to(:schedule) }
-  it { should have_many(:trips) }
+  it { should have_many(:trips).dependent(:destroy) }
 end
 
 RSpec.describe Route, "validations", type: :model do

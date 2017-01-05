@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Schedule, "associations", type: :model do
-  it { should have_many(:agencies) }
-  it { should have_many(:calendars) }
-  it { should have_many(:calendar_dates) }
-  it { should have_many(:routes) }
-  it { should have_many(:stops) }
-  it { should have_many(:trips) }
-  it { should have_many(:stop_times) }
+  it { should have_many(:agencies).dependent(:destroy) }
+  it { should have_many(:calendars).dependent(:destroy) }
+  it { should have_many(:calendar_dates).dependent(:destroy) }
+  it { should have_many(:routes).dependent(:destroy) }
+  it { should have_many(:stops).dependent(:destroy) }
+  it { should have_many(:trips).dependent(:destroy) }
+  it { should have_many(:stop_times).dependent(:destroy) }
 end
 
 RSpec.describe Schedule, "validations", type: :model do

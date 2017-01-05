@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Stop, "association", type: :model do
   it { should belong_to(:schedule) }
-  it { should have_many(:stop_times) }
+  it { should have_many(:stop_times).dependent(:destroy) }
 end
 
 RSpec.describe Stop, "validations", type: :model do

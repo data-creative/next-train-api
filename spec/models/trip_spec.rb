@@ -4,7 +4,7 @@ RSpec.describe Trip, "association", type: :model do
   it { should belong_to(:schedule) }
   it { should belong_to(:route) }
   #it { should belong_to(:service) }
-  it { should have_many(:stop_times) }
+  it { should have_many(:stop_times).dependent(:destroy) }
 end
 
 RSpec.describe Trip, "validations", type: :model do

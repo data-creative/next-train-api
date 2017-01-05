@@ -1,11 +1,11 @@
 class Schedule < ApplicationRecord
-  has_many :agencies, :inverse_of => :schedule
-  has_many :calendars, :inverse_of => :schedule
-  has_many :calendar_dates, :inverse_of => :schedule
-  has_many :routes, :inverse_of => :schedule
-  has_many :stops, :inverse_of => :schedule
-  has_many :trips, :inverse_of => :schedule
-  has_many :stop_times, :inverse_of => :schedule
+  has_many :agencies, :inverse_of => :schedule, :dependent => :destroy
+  has_many :calendars, :inverse_of => :schedule, :dependent => :destroy
+  has_many :calendar_dates, :inverse_of => :schedule, :dependent => :destroy
+  has_many :routes, :inverse_of => :schedule, :dependent => :destroy
+  has_many :stops, :inverse_of => :schedule, :dependent => :destroy
+  has_many :trips, :inverse_of => :schedule, :dependent => :destroy
+  has_many :stop_times, :inverse_of => :schedule, :dependent => :destroy
 
   validates_presence_of :source_url, :published_at
   validates_inclusion_of :active, :in => [true, false]
