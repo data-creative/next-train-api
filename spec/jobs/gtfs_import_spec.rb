@@ -1,6 +1,19 @@
 require 'rails_helper'
 require_relative '../support/gtfs_import_helpers'
 
+RSpec.describe GtfsImport, "#forced?", type: :job do
+  let(:source_url){ "http://www.my-site.com/gtfs-feed.zip"}
+  let(:import){ GtfsImport.new(:source_url => source_url)}
+  let(:forced_import){ GtfsImport.new(:source_url => source_url, :forced => true)}
+  let(:nonforced_import){ GtfsImport.new(:source_url => source_url, :forced => false)}
+
+  it "should properly indicate whether or not the :forced option was invoked" do
+    expect(import.forced?).to eql(false)
+    expect(forced_import.forced?).to eql(true)
+    expect(nonforced_import.forced?).to eql(false)
+  end
+end
+
 RSpec.describe GtfsImport, "#perform", type: :job do
   let(:source_url){ "http://www.my-site.com/gtfs-feed.zip"}
   let(:import){ described_class.new(:source_url => source_url) }
@@ -70,6 +83,25 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
     it "should mark the imported schedule as active" do
       expect(imported_schedule.active?).to eql(true)
+    end
+  end
+
+  context "when forced" do
+    let!(:pre_import_hosted_active_schedule){ create(:active_schedule, {
+      :published_at => headers["last-modified"].first.to_datetime,
+      :content_length => headers["content-length"].first.to_i,
+      :etag => headers["etag"].first.tr('"','')
+    }) }
+    let(:forced_import){ GtfsImport.new(:source_url => source_url, :forced => true)}
+
+    before(:each) do
+      stub_download_zip(source_url)
+    end
+
+    it "should proceed regardless of whether or not the hosted schedule matches the active schedule" do
+      expect(forced_import).to receive(:transform_and_load)
+      expect(forced_import).to receive(:activate)
+      forced_import.perform
     end
   end
 end

@@ -10,14 +10,20 @@ class GtfsImport < ApplicationJob
   def initialize(options = {})
     @source_url = options[:source_url] || ENV.fetch('GTFS_SOURCE_URL', nil) || "http://www.shorelineeast.com/google_transit.zip"
     @destination_path = options[:destination_path] || "./tmp/google_transit.zip"
+    @forced = (options[:forced] == true) || false
     @logger = Rails.logger
   end
 
   def perform
-    if hosted_schedule != active_schedule
+    hosted_schedule
+    if forced? || (hosted_schedule != active_schedule)
       transform_and_load
       activate
     end
+  end
+
+  def forced?
+    @forced == true
   end
 
   private
