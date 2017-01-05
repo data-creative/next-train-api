@@ -4,6 +4,8 @@ require 'zip'
 class GtfsImport < ApplicationJob
   queue_as :default
 
+  attr_reader :started_at, :ended_at
+
   # @param [Hash] options
   # @param [Hash] options [String] source_url Points to a hosted source of transit data in GTFS format (e.g. 'http://my-site.com/gtfs/some_feed.zip').
   # @param [Hash] options [String] destination_path Specifies where the data should be forcibly downloaded before it is loaded into the database.
@@ -11,16 +13,21 @@ class GtfsImport < ApplicationJob
     @source_url = options[:source_url] || ENV.fetch('GTFS_SOURCE_URL', nil) || "http://www.shorelineeast.com/google_transit.zip"
     @destination_path = options[:destination_path] || "./tmp/google_transit.zip"
     @forced = (options[:forced] == true) || false
-    @logger = (Rails.env.development? ? Logger.new(STDOUT) : Rails.logger )
+    @logger = options[:logger] || (Rails.env.development? ? Logger.new(STDOUT) : Rails.logger )
+    @started_at = nil
+    @ended_at = nil
   end
 
   def perform
+    @started_at = Time.zone.now
     @logger.info{ "IMPORTING GTFS FEED FROM #{@source_url}" }
     hosted_schedule.destroy if forced?
     if hosted_schedule != active_schedule
       transform_and_load
       activate
     end
+    @ended_at = Time.zone.now
+    @logger.info{ "SUCCESSFUL AFTER #{(@ended_at - @started_at)} SECONDS" }
   end
 
   def forced?

@@ -27,6 +27,16 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       allow(import).to receive(:transform_and_load).and_raise("OOPS SOME VALIDATION ERROR OR SOMETHING")
     end
 
+    it "should posess a started_at but not an ended_at " do
+      begin
+        import.perform
+      rescue
+      ensure
+        expect(import.started_at).to_not be_blank
+        expect(import.ended_at).to be_blank
+      end
+    end
+
     it "should not de-activate the active schedule" do
       begin
         import.perform
@@ -54,6 +64,11 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     before(:each) do
       stub_download_zip(source_url)
       import.perform
+    end
+
+    it "should posess a started_at and an ended_at " do
+      expect(import.started_at).to_not be_blank
+      expect(import.ended_at).to_not be_blank
     end
 
     it "should persist transit schedule metadata" do
@@ -96,6 +111,12 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
     before(:each) do
       stub_download_zip(source_url)
+    end
+
+    it "should posess a started_at and an ended_at " do
+      forced_import.perform
+      expect(forced_import.started_at).to_not be_blank
+      expect(forced_import.ended_at).to_not be_blank
     end
 
     it "should proceed regardless of whether or not the hosted schedule matches the active schedule" do
