@@ -11,9 +11,11 @@ class GtfsImport < ApplicationJob
     @source_url = options[:source_url] || ENV.fetch('GTFS_SOURCE_URL', nil) || "http://www.shorelineeast.com/google_transit.zip"
     @destination_path = options[:destination_path] || "./tmp/google_transit.zip"
     @forced = (options[:forced] == true) || false
+    @logger = (Rails.env.development? ? Logger.new(STDOUT) : Rails.logger )
   end
 
   def perform
+    @logger.info{ "IMPORTING GTFS FEED FROM #{@source_url}" }
     hosted_schedule.destroy if forced?
     if hosted_schedule != active_schedule
       transform_and_load
@@ -67,6 +69,7 @@ class GtfsImport < ApplicationJob
   end
 
   def activate
+    @logger.info{ "ACTIVATING SCHEDULE" }
     @schedule.activate!
   end
 
@@ -145,6 +148,7 @@ class GtfsImport < ApplicationJob
 
   # @see https://developers.google.com/transit/gtfs/reference/agency-file
   def parse_agency(zip_file)
+    @logger.info{ "IMPORTING AGENCIES" }
     results = read_file(zip_file, "agency.txt")
     CSV.parse(results, :headers => true) do |row|
       agency = Agency.where(:schedule_id => @schedule.id, :url => row["agency_url"]).first_or_initialize
@@ -156,10 +160,12 @@ class GtfsImport < ApplicationJob
         :lang => row["agency_lang"]
       })
     end
+    @logger.info{ "... #{Agency.count}" }
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/calendar-file
   def parse_calendar(zip_file)
+    @logger.info{ "IMPORTING CALENDARS" }
     results = read_file(zip_file, "calendar.txt")
     CSV.parse(results, :headers => true) do |row|
       calendar = Calendar.where(:schedule_id => @schedule.id, :service_guid => row["service_id"]).first_or_initialize
@@ -175,10 +181,12 @@ class GtfsImport < ApplicationJob
         :end_date => row["end_date"].to_date
       })
     end
+    @logger.info{ "... #{Calendar.count}" }
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/calendar_dates-file
   def parse_calendar_dates(zip_file)
+    @logger.info{ "IMPORTING CALENDAR DATES" }
     results = read_file(zip_file, "calendar_dates.txt")
     CSV.parse(results, :headers => true) do |row|
       calendar_date = CalendarDate.where({
@@ -188,10 +196,12 @@ class GtfsImport < ApplicationJob
       }).first_or_initialize
       calendar_date.update!(:exception_code => parse_numeric(row["exception_type"]))
     end
+    @logger.info{ "... #{CalendarDate.count}" }
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/routes-file
   def parse_routes(zip_file)
+    @logger.info{ "IMPORTING ROUTES" }
     results = read_file(zip_file, "routes.txt")
     CSV.parse(results, :headers => true) do |row|
       route = Route.where(:schedule_id => @schedule.id, :guid => row["route_id"]).first_or_initialize
@@ -206,10 +216,12 @@ class GtfsImport < ApplicationJob
         :text_color => row["text_color"],
       })
     end
+    @logger.info{ "... #{Route.count}" }
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/stops-file
   def parse_stops(zip_file)
+    @logger.info{ "IMPORTING STOPS" }
     results = read_file(zip_file, "stops.txt")
     CSV.parse(results, :headers => true) do |row|
       stop = Stop.where(:schedule_id => @schedule.id, :guid => row["stop_id"]).first_or_initialize
@@ -227,10 +239,12 @@ class GtfsImport < ApplicationJob
         :wheelchair_code => parse_numeric(row["wheelchair_boarding"])
       })
     end
+    @logger.info{ "... #{Stop.count}" }
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/trips-file
   def parse_trips(zip_file)
+    @logger.info{ "IMPORTING TRIPS" }
     results = read_file(zip_file, "trips.txt")
     CSV.parse(results, :headers => true) do |row|
       trip = Trip.where(:schedule_id => @schedule.id, :guid => row["trip_id"]).first_or_initialize
@@ -246,10 +260,12 @@ class GtfsImport < ApplicationJob
         :bicycle_code => parse_numeric(row["bikes_allowed"])
       })
     end
+    @logger.info{ "... #{CalendarDate.count}" }
   end
 
   # @see https://developers.google.com/transit/gtfs/reference/stop_times-file
   def parse_stop_times(zip_file)
+    @logger.info{ "IMPORTING STOP TIMES" }
     results = read_file(zip_file, "stop_times.txt")
     CSV.parse(results, :headers => true) do |row|
       stop_time = StopTime.where({
@@ -263,8 +279,8 @@ class GtfsImport < ApplicationJob
       # @see https://gist.github.com/s2t2/0d2929e0ecaba85823e1314935e7941e
       # consider importing all records and adding stop_sequence to the composite key.
       if stop_time.persisted?
-        Rails.logger.info{ "UNEXPECTED STOP TIME #{stop_time.trip_guid}-#{stop_time.stop_guid} (#{stop_time.stop_sequence} vs #{row['stop_sequence']})" }
         raise UnexpectedStopTime.new(row.to_h) unless stop_time.stop_sequence + 1 == row.to_h['stop_sequence'].to_i
+        @logger.info{ "... CONSOLIDATING STOP TIMES #{stop_time.trip_guid}-#{stop_time.stop_guid} (#{stop_time.stop_sequence} vs #{row['stop_sequence']})" }
         stop_time.update!(:departure_time => row["departure_time"], :stop_sequence => row["stop_sequence"].to_i)
       else
         stop_time.update!({
@@ -279,6 +295,7 @@ class GtfsImport < ApplicationJob
         })
       end
     end
+    @logger.info{ "... #{StopTime.count}" }
   end
   class UnexpectedStopTime < StandardError ; end
 
