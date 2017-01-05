@@ -11,7 +11,6 @@ class GtfsImport < ApplicationJob
     @source_url = options[:source_url] || ENV.fetch('GTFS_SOURCE_URL', nil) || "http://www.shorelineeast.com/google_transit.zip"
     @destination_path = options[:destination_path] || "./tmp/google_transit.zip"
     @forced = (options[:forced] == true) || false
-    @logger = Rails.logger
   end
 
   def perform
@@ -263,8 +262,8 @@ class GtfsImport < ApplicationJob
       # there are sequential stop_times which share a composite key but differ in sequence.
       # @see https://gist.github.com/s2t2/0d2929e0ecaba85823e1314935e7941e
       # consider importing all records and adding stop_sequence to the composite key.
-      if stop_time.persisted?
-        @logger.info{ "UNEXPECTED STOP TIME #{stop_time.trip_guid}-#{stop_time.stop_guid} (#{stop_time.stop_sequence} vs #{row['stop_sequence']})" }
+      if stop_time.persisted? && stop_time.created_at > 3.minutes.ago # 3 minutes is kind of arbitraty
+        Rails.logger.info{ "UNEXPECTED STOP TIME #{stop_time.trip_guid}-#{stop_time.stop_guid} (#{stop_time.stop_sequence} vs #{row['stop_sequence']})" }
         raise UnexpectedStopTime.new(row.to_h) unless stop_time.stop_sequence + 1 == row.to_h['stop_sequence'].to_i
         stop_time.update!(:departure_time => row["departure_time"], :stop_sequence => row["stop_sequence"].to_i)
       else

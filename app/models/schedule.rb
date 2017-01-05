@@ -16,10 +16,6 @@ class Schedule < ApplicationRecord
     where(:active => true).first
   end
 
-  ###def self.latest
-  ###  order(:published_at => :desc).last
-  ###end
-
   def activate!
     self.class.active.update!(:active => false) if self.class.active.present?
     update!(:active => true)
