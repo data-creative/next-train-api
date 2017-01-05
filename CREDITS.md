@@ -55,3 +55,7 @@
 ## Zip Files
 
   + http://stackoverflow.com/a/13665552/670433
+
+## Logging
+
+  + http://guides.rubyonrails.org/debugging_rails_applications.html#what-is-the-logger-questionmark

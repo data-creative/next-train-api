@@ -36,6 +36,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
   context "when successful" do
     let(:imported_stop){ Stop.find_by_guid("NHV") }
+    let(:imported_consolidated_stop_times){ StopTime.where(:trip_guid => "1640", :stop_guid => "NHV")} # there were originally two different stop times, the first with arrival and departure at 17:44:00, and the second with arrival and departure at 17:48:00
 
     before(:each) do
       stub_download_zip(source_url)
@@ -52,13 +53,19 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       expect(CalendarDate.count).to eql(8)
       expect(Route.count).to eql(1)
       expect(Stop.count).to eql(17)
-      expect(StopTime.count).to eql(120) # there are two known duplicates, else would be 122
+      expect(StopTime.count).to eql(120) # there are two intentionally sequential duplicates, else should expect 122
       expect(Trip.count).to eql(14)
     end
 
     it "should persist stop latitude and longitude to 8 decimal places" do
       expect(imported_stop.latitude.to_f).to eql(41.29771887)
       expect(imported_stop.longitude.to_f).to eql(-72.92673111)
+    end
+
+    it "should consolidate duplicative sequential stop times, using the earliest arrival and latest departure" do
+      expect(imported_consolidated_stop_times.count).to eql(1)
+      expect(imported_consolidated_stop_times.first.arrival_time).to eql("17:44:00")
+      expect(imported_consolidated_stop_times.first.departure_time).to eql("17:48:00")
     end
 
     it "should mark the imported schedule as active" do

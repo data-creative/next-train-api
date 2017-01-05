@@ -10,6 +10,7 @@ class GtfsImport < ApplicationJob
   def initialize(options = {})
     @source_url = options[:source_url] || ENV.fetch('GTFS_SOURCE_URL', nil) || "http://www.shorelineeast.com/google_transit.zip"
     @destination_path = options[:destination_path] || "./tmp/google_transit.zip"
+    @logger = Rails.logger
   end
 
   def perform
@@ -254,22 +255,24 @@ class GtfsImport < ApplicationJob
 
       # tracking a potential issue with the gtfs data...
       # there are sequential stop_times which share a composite key but differ in sequence.
-      # consider adding stop_sequence to the composite key.
+      # @see https://gist.github.com/s2t2/0d2929e0ecaba85823e1314935e7941e
+      # consider importing all records and adding stop_sequence to the composite key.
       if stop_time.persisted?
-        #puts "UNEXPECTED STOP TIME #{stop_time.trip_guid}-#{stop_time.stop_guid} (#{stop_time.stop_sequence} vs #{row['stop_sequence']})"
+        @logger.info{ "UNEXPECTED STOP TIME #{stop_time.trip_guid}-#{stop_time.stop_guid} (#{stop_time.stop_sequence} vs #{row['stop_sequence']})" }
         raise UnexpectedStopTime.new(row.to_h) unless stop_time.stop_sequence + 1 == row.to_h['stop_sequence'].to_i
+        stop_time.update!(:departure_time => row["departure_time"], :stop_sequence => row["stop_sequence"].to_i)
+      else
+        stop_time.update!({
+          :stop_sequence => row["stop_sequence"].to_i,
+          :arrival_time => row["arrival_time"],
+          :departure_time => row["departure_time"],
+          :headsign => row["stop_headsign"],
+          :pickup_code => parse_numeric(row["pickup_type"]),
+          :dropoff_code => parse_numeric(row["drop_off_type"]),
+          :distance => row["shape_dist_traveled"],
+          :code => parse_numeric(row["timepoint"])
+        })
       end
-
-      stop_time.update!({
-        :stop_sequence => row["stop_sequence"].to_i,
-        :arrival_time => row["arrival_time"],
-        :departure_time => row["departure_time"],
-        :headsign => row["stop_headsign"],
-        :pickup_code => parse_numeric(row["pickup_type"]),
-        :dropoff_code => parse_numeric(row["drop_off_type"]),
-        :distance => row["shape_dist_traveled"],
-        :code => parse_numeric(row["timepoint"])
-      })
     end
   end
   class UnexpectedStopTime < StandardError ; end
