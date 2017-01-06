@@ -1,5 +1,5 @@
 # @see https://developers.google.com/transit/gtfs/reference/stop_times-file
-class CalendarsFileParser < FileParser
+class StopTimesFileParser < FileParser
   def perform
     @logger.info{ "IMPORTING STOP TIMES" }
     results = read_file("stop_times.txt")

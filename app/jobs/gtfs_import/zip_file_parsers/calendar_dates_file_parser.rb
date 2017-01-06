@@ -1,5 +1,5 @@
 # @see https://developers.google.com/transit/gtfs/reference/calendar_dates-file
-class CalendarsFileParser < FileParser
+class CalendarDatesFileParser < FileParser
   def perform
     @logger.info{ "IMPORTING CALENDAR DATES" }
     results = read_file("calendar_dates.txt")

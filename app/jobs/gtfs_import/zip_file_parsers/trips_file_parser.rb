@@ -1,5 +1,5 @@
 # @see https://developers.google.com/transit/gtfs/reference/trips-file
-class CalendarsFileParser < FileParser
+class TripsFileParser < FileParser
   def perform
     @logger.info{ "IMPORTING TRIPS" }
     results = read_file("trips.txt")

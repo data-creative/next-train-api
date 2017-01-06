@@ -78,15 +78,11 @@ class GtfsImport < ApplicationJob
       AgencyFileParser.new(options).perform
       CalendarsFileParser.new(options).perform
       CalendarDatesFileParser.new(options).perform
-      RoutesFileParser.new(options).perform
+      RoutesFileParser.new(options).perform #NOTE: likely to depend on successful completion of AgencyFileParser
       StopsFileParser.new(options).perform
-      TripsFileParser.new(options).perform #NOTE: depends on successful completion of routes
-      StopTimesFileParser.new(options).perform #NOTE: depends on successful completion of stops and trips
+      TripsFileParser.new(options).perform #NOTE: depends on successful completion of RoutesFileParser
+      StopTimesFileParser.new(options).perform #NOTE: depends on successful completion of StopsFileParser and TripsFileParser
     end
-    # ok, so these performances are not executing sequentially for some reason
-    # ... this immediately throws "ActiveRecord::RecordInvalid: Validation failed: Route must exist" because it is trying to parse routes before trips are done.
-    # ... WAT?
-    # ... http://stackoverflow.com/questions/41495844/ruby-how-to-enforce-sequential-execution
   end
 
   def activate
