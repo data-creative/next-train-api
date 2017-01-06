@@ -1,7 +1,6 @@
 require 'httparty'
 require 'zip'
 
-require_relative "./gtfs_import/zip_file_parser"
 require_relative "./gtfs_import/zip_file_parsers/agency_file_parser"
 require_relative "./gtfs_import/zip_file_parsers/calendars_file_parser"
 require_relative "./gtfs_import/zip_file_parsers/calendar_dates_file_parser"
@@ -13,7 +12,7 @@ require_relative "./gtfs_import/zip_file_parsers/trips_file_parser"
 class GtfsImport < ApplicationJob
   queue_as :default
 
-  attr_reader :started_at, :ended_at
+  attr_reader :started_at, :ended_at, :schedule, :destination_path
 
   # @param [Hash] options
   # @param [Hash] options [String] source_url Points to a hosted source of transit data in GTFS format (e.g. 'http://my-site.com/gtfs/some_feed.zip').
@@ -32,6 +31,8 @@ class GtfsImport < ApplicationJob
     @logger.info{ "IMPORTING GTFS FEED FROM #{@source_url}" }
     hosted_schedule.destroy if forced?
     if hosted_schedule != active_schedule
+      delete_destination
+      extract
       transform_and_load
       activate
     end
@@ -66,13 +67,17 @@ class GtfsImport < ApplicationJob
     response.headers.to_h
   end
 
-  def transform_and_load
+  def delete_destination
     FileUtils.rm_rf(@destination_path)
+  end
 
+  def extract
     File.open(@destination_path, "wb") do |zip_file|
       zip_file.write(response.body)
     end
+  end
 
+  def transform_and_load
     Zip::File.open(@destination_path) do |zip_file|
       options = {:zip_file => zip_file, :schedule => @schedule, :logger => @logger}
       AgencyFileParser.new(options).perform

@@ -1,5 +1,7 @@
+require_relative "../zip_file_parser"
+
 # @see https://developers.google.com/transit/gtfs/reference/stops-file
-class StopsFileParser < FileParser
+class StopsFileParser < ZipFileParser
   def perform
     @logger.info{ "IMPORTING STOPS" }
     results = read_file("stops.txt")

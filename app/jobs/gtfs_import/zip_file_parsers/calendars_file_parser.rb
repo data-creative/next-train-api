@@ -1,5 +1,7 @@
+require_relative "../zip_file_parser"
+
 # @see https://developers.google.com/transit/gtfs/reference/calendar-file
-class CalendarsFileParser < FileParser
+class CalendarsFileParser < ZipFileParser
   def perform
     @logger.info{ "IMPORTING CALENDARS" }
     results = read_file("calendar.txt")

@@ -1,5 +1,7 @@
+require_relative "../zip_file_parser"
+
 # @see https://developers.google.com/transit/gtfs/reference/trips-file
-class TripsFileParser < FileParser
+class TripsFileParser < ZipFileParser
   def perform
     @logger.info{ "IMPORTING TRIPS" }
     results = read_file("trips.txt")

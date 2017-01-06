@@ -1,5 +1,7 @@
+require_relative "../zip_file_parser"
+
 # @see https://developers.google.com/transit/gtfs/reference/stop_times-file
-class StopTimesFileParser < FileParser
+class StopTimesFileParser < ZipFileParser
   def perform
     @logger.info{ "IMPORTING STOP TIMES" }
     results = read_file("stop_times.txt")

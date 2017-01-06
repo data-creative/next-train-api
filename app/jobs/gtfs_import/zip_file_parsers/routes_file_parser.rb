@@ -1,5 +1,7 @@
+require_relative "../zip_file_parser"
+
 # @see https://developers.google.com/transit/gtfs/reference/routes-file
-class RoutesFileParser < FileParser
+class RoutesFileParser < ZipFileParser
   def perform
     @logger.info{ "IMPORTING ROUTES" }
     results = read_file("routes.txt")

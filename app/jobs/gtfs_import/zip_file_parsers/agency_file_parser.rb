@@ -1,5 +1,7 @@
+require_relative "../zip_file_parser"
+
 # @see https://developers.google.com/transit/gtfs/reference/agency-file
-class AgencyFileParser < FileParser
+class AgencyFileParser < ZipFileParser
   def perform
     @logger.info{ "IMPORTING AGENCIES" }
     results = read_file("agency.txt")

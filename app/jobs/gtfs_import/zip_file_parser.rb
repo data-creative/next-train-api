@@ -1,8 +1,8 @@
-class FileParser
-  def initialize(options)
+class ZipFileParser
+  def initialize(options = {})
     @zip_file = options[:zip_file]
     @schedule = options[:schedule]
-    @logger = options[:logger]
+    @logger = options[:logger] || (Rails.env.development? ? Logger.new(STDOUT) : Rails.logger )
   end
 
   def read_file(entry_name)
