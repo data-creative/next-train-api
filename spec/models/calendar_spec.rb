@@ -21,3 +21,21 @@ RSpec.describe Calendar, "validations", type: :model do
   subject { create(:calendar) } # line below needs this to avoid Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::ExistingRecordInvalid. not sure if the expectations above this line are affected...
   it { should validate_uniqueness_of(:service_guid).scoped_to(:schedule_id) }
 end
+
+RSpec.describe Calendar, ".in_service_on", type: :model do
+  let!(:calendar){ create(:calendar, :start_date => "2017-01-01".to_date, :end_date => "2017-12-31".to_date, :sunday => true)}
+
+  it "should include calendars starting before and ending after the specified date" do
+    expect(described_class.in_service_on("2017-07-07")).to_not be_empty
+  end
+
+  it "should be inclusive, returning calendars starting or ending on the specified date" do
+    expect(described_class.in_service_on("2017-01-01")).to_not be_empty
+    expect(described_class.in_service_on("2017-12-31")).to_not be_empty
+  end #NOTE: GTFS specification says the end_date "is included in the service interval."
+
+  it "should not include calendars starting after or ending before the specified date" do
+    expect(described_class.in_service_on("2016-06-06")).to be_empty
+    expect(described_class.in_service_on("2018-08-08")).to be_empty
+  end
+end
