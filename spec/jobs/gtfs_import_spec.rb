@@ -126,19 +126,3 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     end
   end
 end
-
-RSpec.describe GtfsImport, "#parse_numeric", type: :job do
-  it "should convert a numeric string to an integer" do
-    expect(described_class.new.send(:parse_numeric, "0")).to eql(0)
-  end
-
-  it "should convert a blank value to nil, not zero" do
-    expect(described_class.new.send(:parse_numeric, "")).to eql(nil)
-  end
-end
-
-RSpec.describe GtfsImport, "#parse_decimal", type: :job do
-  it "should retain 8 decimal places" do
-    expect(described_class.new.send(:parse_decimal, " -72.92673110961914")).to eql(-72.92673111)
-  end
-end
