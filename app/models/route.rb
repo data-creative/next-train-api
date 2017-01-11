@@ -1,6 +1,6 @@
 class Route < ApplicationRecord
   belongs_to :schedule, :inverse_of => :routes
-  has_many :trips, :inverse_of => :route, :primary_key => :guid, :foreign_key => :route_guid, :dependent => :destroy
+  has_many :trips, ->(route){ where("trips.schedule_id = ?", route.schedule_id) }, :inverse_of => :route, :primary_key => :guid, :foreign_key => :route_guid, :dependent => :destroy
 
   validates_associated :schedule
   validates_presence_of :schedule_id, :guid, :short_name, :long_name, :code

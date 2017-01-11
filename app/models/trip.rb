@@ -2,7 +2,7 @@ class Trip < ApplicationRecord
   belongs_to :schedule, :inverse_of => :trips
   belongs_to :route, :inverse_of => :trips, :primary_key => :guid, :foreign_key => :route_guid
   #belongs_to :service, :inverse_of => :trips
-  has_many :stop_times, :inverse_of => :trip, :primary_key => :guid, :foreign_key => :trip_guid, :dependent => :destroy
+  has_many :stop_times, ->(trip){ where("stop_times.schedule_id = ?", trip.schedule_id) }, :inverse_of => :trip, :primary_key => :guid, :foreign_key => :trip_guid, :dependent => :destroy
 
   validates_associated :schedule
   validates_associated :route

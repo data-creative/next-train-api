@@ -1,8 +1,22 @@
 require 'rails_helper'
 
-RSpec.describe Stop, "association", type: :model do
+RSpec.describe Stop, "associations", type: :model do
   it { should belong_to(:schedule) }
   it { should have_many(:stop_times).dependent(:destroy) }
+
+  describe "when having many stop times" do
+    let(:schedule){ create(:schedule, :id => 123)}
+    let(:stop){ create(:stop, :schedule_id => schedule.id) }
+    let(:stop_time){ create(:stop_time, :schedule_id => schedule.id, :stop_guid => stop.guid)}
+
+    let(:other_schedule){ create(:schedule, :id => 456)}
+    let(:stop_time_from_another_schedule){ create(:stop_time, :schedule_id => other_schedule.id, :stop_guid => stop.guid)} # the point is here that both stop_times share the same stop, as if they are just different versions of the same record, but belonging to a different schedules
+
+    it "should have only those belonging to the same schedule as it" do
+      expect(stop.stop_times).to include(stop_time)
+      expect(stop.stop_times).to_not include(stop_time_from_another_schedule)
+    end
+  end
 end
 
 RSpec.describe Stop, "validations", type: :model do

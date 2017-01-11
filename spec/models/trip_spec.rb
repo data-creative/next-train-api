@@ -5,6 +5,20 @@ RSpec.describe Trip, "association", type: :model do
   it { should belong_to(:route) }
   #it { should belong_to(:service) }
   it { should have_many(:stop_times).dependent(:destroy) }
+
+  describe "when having many stop times" do
+    let(:schedule){ create(:schedule, :id => 123)}
+    let(:trip){ create(:trip, :schedule_id => schedule.id) }
+    let(:stop_time){ create(:stop_time, :schedule_id => schedule.id, :trip_guid => trip.guid)}
+
+    let(:other_schedule){ create(:schedule, :id => 456)}
+    let(:stop_time_from_another_schedule){ create(:stop_time, :schedule_id => other_schedule.id, :trip_guid => trip.guid)} # the point is here that both stop_times share the same trip, as if they are just different versions of the same record, but belonging to a different schedules
+
+    it "should have only those belonging to the same schedule as it" do
+      expect(trip.stop_times).to include(stop_time)
+      expect(trip.stop_times).to_not include(stop_time_from_another_schedule)
+    end
+  end
 end
 
 RSpec.describe Trip, "validations", type: :model do

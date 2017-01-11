@@ -21,13 +21,13 @@ class GtfsImport < ApplicationJob
     @source_url = options[:source_url] || ENV.fetch('GTFS_SOURCE_URL', nil) || "http://www.shorelineeast.com/google_transit.zip"
     @destination_path = options[:destination_path] || "./tmp/google_transit.zip"
     @forced = (options[:forced] == true) || false
-    @logger = options[:logger] || (Rails.env.development? ? Logger.new(STDOUT) : Rails.logger )
-    @started_at = nil
-    @ended_at = nil
+    @logger = options[:logger] || (Rails.env.development? ? Logger.new(STDOUT) : Rails.logger )  #TODO: move me into ApplicationJob
+    @started_at = nil #TODO: move me into ApplicationJob
+    @ended_at = nil #TODO: move me into ApplicationJob
   end
 
   def perform
-    @started_at = Time.zone.now
+    @started_at = Time.zone.now #TODO: move me into ApplicationJob
     @logger.info{ "IMPORTING GTFS FEED FROM #{@source_url}" }
     hosted_schedule.destroy if forced?
     if hosted_schedule != active_schedule
@@ -36,8 +36,8 @@ class GtfsImport < ApplicationJob
       transform_and_load
       activate
     end
-    @ended_at = Time.zone.now
-    @logger.info{ "SUCCESSFUL AFTER #{(@ended_at - @started_at)} SECONDS" }
+    @ended_at = Time.zone.now #TODO: move me into ApplicationJob
+    @logger.info{ "SUCCESSFUL AFTER #{(@ended_at - @started_at)} SECONDS" } #TODO: move me into ApplicationJob
   end
 
   def forced?

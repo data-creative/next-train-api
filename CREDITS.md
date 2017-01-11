@@ -46,6 +46,7 @@
 ## ActiveRecord
 
   + http://apidock.com/rails/ActiveRecord/Associations/ClassMethods/belongs_to
+  + http://stackoverflow.com/questions/24642005/rails-association-with-multiple-foreign-keys
 
 ## Shore Line East GTFS
 
