@@ -38,7 +38,7 @@ class GtfsImport < ApplicationJob
     end
     @ended_at = Time.zone.now #TODO: move me into ApplicationJob
     @logger.info{ "SUCCESSFUL AFTER #{(@ended_at - @started_at)} SECONDS" } #TODO: move me into ApplicationJob
-  end
+  end #TODO: destroy existing data only after activating the new schedule only after data finishes loading
 
   def forced?
     @forced == true

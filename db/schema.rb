@@ -164,15 +164,6 @@ ActiveRecord::Schema.define(version: 20170103002208) do
     t.index ["zone_guid"], name: "index_stops_on_zone_guid", using: :btree
   end
 
-  create_table "trains", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "origin"
-    t.datetime "origin_departure"
-    t.string   "destination"
-    t.datetime "destination_arrival"
-    t.datetime "created_at",          null: false
-    t.datetime "updated_at",          null: false
-  end
-
   create_table "trips", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "schedule_id",     null: false
     t.string   "guid",            null: false

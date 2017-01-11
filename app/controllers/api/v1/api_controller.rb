@@ -1,3 +1,5 @@
+require "./app/models/api/v1/responses/trains_response"
+
 class Api::V1::ApiController < ApplicationController
 
   # Trains Endpoint
@@ -49,16 +51,12 @@ class Api::V1::ApiController < ApplicationController
       @response[:errors] << "Invalid departure date"
     end
 
+    #
     # Populate results
+    #
 
-    if @response[:errors].empty?
-      @response[:results] = Train.departing_on(q[:date]).from_station(q[:origin]).to_station(q[:destination]).map do |train|
-        {
-          id: train.id,
-          origin_departure: train.origin_departure.to_s,
-          destination_arrival: train.destination_arrival.to_s
-        }
-      end
+    @response[:results] = if @response[:errors].empty?
+      Api::V1::TrainsResponse.new(q).results
     end
 
     respond_to do |format|

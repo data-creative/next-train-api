@@ -60,3 +60,8 @@
 ## Logging
 
   + http://guides.rubyonrails.org/debugging_rails_applications.html#what-is-the-logger-questionmark
+
+## Rails
+
+  + http://stackoverflow.com/questions/7750769/recursively-including-all-model-subdirectories
+  + http://blog.arkency.com/2014/11/dont-forget-about-eager-load-when-extending-autoload/
