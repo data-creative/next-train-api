@@ -46,7 +46,7 @@ class Api::V1::ApiController < ApplicationController
     end
 
     if q[:date].blank?
-      @response[:errors] << "Please specify a departure date (e.g. '#{Date.today.to_s}')."
+      @response[:errors] << "Please specify a departure date (e.g. '#{Date.today}')."
     elsif !date_valid?(q[:date])
       @response[:errors] << "Invalid departure date"
     end

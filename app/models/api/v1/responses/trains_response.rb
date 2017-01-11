@@ -12,6 +12,7 @@ class Api::V1::TrainsResponse
   def results
     return @results if @results
 
+    #TODO: convert this query into ActiveRecord syntax and ensure protection from SQL injection
     sql_query = <<-SQL
       SELECT
         c.schedule_id
@@ -19,7 +20,6 @@ class Api::V1::TrainsResponse
         ,t.guid AS trip_guid
         ,t.route_guid
         ,t.headsign AS trip_headsign
-        -- ,trip_stops.stops_in_sequence
         ,st.stop_sequence
         ,st.stop_guid
         ,st.arrival_time
@@ -33,14 +33,14 @@ class Api::V1::TrainsResponse
          ,group_concat(stop_guid ORDER BY stop_sequence SEPARATOR ' > ') AS stops_in_sequence
         FROM stop_times
         GROUP BY trip_guid
-        HAVING instr(stops_in_sequence, 'BRN') <> 0
-          AND instr(stops_in_sequence, 'NHV') <> 0
-          AND instr(stops_in_sequence, 'BRN') < instr(stops_in_sequence, 'NHV') -- ensures proper trip direction
+        HAVING instr(stops_in_sequence, '#{origin}') <> 0 -- ensures origin station is included in the trip
+          AND instr(stops_in_sequence, '#{destination}') <> 0 -- ensures destination station is included in the trip
+          AND instr(stops_in_sequence, '#{origin}') < instr(stops_in_sequence, '#{destination}') -- ensures proper trip direction
         ORDER BY trip_guid
       ) trip_stops ON trip_stops.trip_guid = t.guid
       LEFT JOIN stop_times st ON st.trip_guid = t.guid AND st.schedule_id = t.schedule_id
-      WHERE wednesday = TRUE
-        AND "2017-01-07" BETWEEN c.start_date AND c.end_date
+      WHERE #{day_of_week} = TRUE
+        AND '#{date}' BETWEEN c.start_date AND c.end_date
       ORDER BY t.guid, stop_sequence
     SQL
 
@@ -63,5 +63,11 @@ class Api::V1::TrainsResponse
     }
 
     @results = formatted_results
+  end
+
+private
+
+  def day_of_week
+    Date.parse(date).strftime("%A").downcase
   end
 end
