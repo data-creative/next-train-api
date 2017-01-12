@@ -1,27 +1,16 @@
-class Api::V1::TrainsResponse
-  attr_reader :query, :received_at, :response_type, :errors, :date, :origin, :destination, :results
+class Api::V1::TrainsResponse < Api::V1::Response
+  attr_reader :date, :origin, :destination
 
   # @example Api::V1::TrainsResponse.new({:date => "2017-01-11", :origin => "BRN", :destination => "NHV"})
-  def initialize(query = {})
-    @query = query
-    @received_at = Time.zone.now
-    @response_type = self.class.name
-    @errors = []
-    @origin = query[:origin]
-    @destination = query[:destination]
-    @date = query[:date]
-    validate_query
-    @results = generate_results
+  def initialize(options = {})
+    @origin = options[:origin]
+    @destination = options[:destination]
+    @date = options[:date]
+    super(options)
   end
 
   def to_h
-    {
-      :query => query,
-      :received_at => received_at,
-      :response_type => response_type,
-      :errors => errors,
-      :results => results
-    }
+    {:query => query, :received_at => received_at, :response_type => response_type, :errors => errors, :results => results}
   end
 
 private
@@ -31,10 +20,6 @@ private
     validate_destination
     validate_date
   end # should add query validation error messages, if necessary
-
-  def generate_results
-    errors.empty? ? query_results : []
-  end # should only return results if there are no query validation errors
 
   def validate_origin
     validate_station(origin, :origin)
@@ -92,8 +77,7 @@ private
     Date.valid_date?(y.to_i, m.to_i, d.to_i)
   end
 
-  # @return [Array] a list of trains matching the given criteria
-  def query_results
+  def raw_results
     #TODO: convert this query into ActiveRecord syntax and ensure protection from SQL injection
     sql = <<-SQL
       SELECT
@@ -126,12 +110,16 @@ private
       ORDER BY t.guid, stop_sequence
     SQL
 
-    raw_results = ActiveRecord::Base.connection.exec_query(sql)
+    ActiveRecord::Base.connection.exec_query(sql)
+  end
 
-    nested_results = raw_results.group_by{|h|
+  def nested_results
+    raw_results.group_by{|h|
       h.select{|k,_| ["schedule_id", "route_guid", "service_guid", "trip_guid","trip_headsign"].include?(k) }
     }
+  end
 
+  def query_results
     formatted_results = nested_results.map{|trip, all_stops|
       origin_stop_time = all_stops.find{|stop| stop["stop_guid"] == origin }
       destination_stop_time = all_stops.find{|stop| stop["stop_guid"] == destination }
@@ -145,7 +133,7 @@ private
     }
 
     return formatted_results
-  end # should prevent SQL injection
+  end
 
   def day_of_week
     Date.parse(date).strftime("%A").downcase
