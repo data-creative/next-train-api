@@ -4,7 +4,7 @@ require_relative '../../../support/gtfs_import_helpers'
 
 RSpec.describe Api::V1::ApiController, type: :controller do
   describe "#trains response" do
-    context "when given no parameters" do
+    context "when receiving no parameters" do
       let(:response){  get(:trains, params: {format: 'json'})  }
 
       it "should indicate the query parameters it received" do
@@ -23,7 +23,7 @@ RSpec.describe Api::V1::ApiController, type: :controller do
       end
     end
 
-    context "when given invalid parameters" do
+    context "when receiving invalid parameters" do
       let(:response){  get(:trains, params: {format: 'json', origin: 'ABC', destination: 'DEF', date: '2day'})  }
 
       it "should indicate the query parameters it received" do
@@ -42,7 +42,7 @@ RSpec.describe Api::V1::ApiController, type: :controller do
       end
     end
 
-    context "when given valid parameters" do
+    context "when receiving valid parameters" do
       let(:response){  get(:trains, params: {format: 'json', origin: 'BRN', destination: 'ST', date: '2016-12-28'})  }
 
       it "should indicate the query parameters it received" do
