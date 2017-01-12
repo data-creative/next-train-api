@@ -12,6 +12,12 @@ Install dependencies for a Ruby on Rails application:
  + `mysql`
  + `mailcatcher`
 
+Add the following environment variable(s) to your profile, modifying value(s) as desired:
+
+````sh
+export GTFS_SOURCE_URL="http://www.shorelineeast.com/google_transit.zip"
+````
+
 ### Installation
 
 Obtain source code:

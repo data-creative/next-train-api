@@ -37,19 +37,38 @@ private
   end # should only return results if there are no query validation errors
 
   def validate_origin
-    if origin.blank?
-      errors << "Please specify an origin station abbreviation (e.g. 'BRN')."
-    elsif !station_valid?(origin)
-      errors << "Invalid origin station abbreviation: #{origin}. Expecting one of: #{station_abbrevs}."
-    end
+    validate_station(origin, :origin)
   end
 
   def validate_destination
-    if destination.blank?
-      errors << "Please specify a destination station abbreviation (e.g. 'NHV')."
-    elsif !station_valid?(destination)
-      errors << "Invalid destination station abbreviation: #{destination}. Expecting one of: #{station_abbrevs}."
+    validate_station(destination, :destination)
+  end
+
+  # @param [String] abbrev the station abbreviation
+  # @param [Symbol] role either :origin or :destination
+  def validate_station(abbrev, role)
+    if abbrev.blank?
+      errors << error_messages[role][:blank]
+    elsif !station_valid?(abbrev)
+      errors << error_messages[role][:invalid]
     end
+  end
+
+  def error_messages
+    {
+      :origin => {
+        :blank => "Please specify an origin station abbreviation (e.g. 'BRN').",
+        :invalid => "Invalid origin station abbreviation: #{origin}. Expecting one of: #{station_abbrevs}."
+      },
+      :destination => {
+        :blank => "Please specify a destination station abbreviation (e.g. 'NHV').",
+        :invalid => "Invalid destination station abbreviation: #{destination}. Expecting one of: #{station_abbrevs}."
+      },
+      :date => {
+        :blank => "Please specify a departure date (e.g. '#{Date.today}').",
+        :invalid => "Invalid departure date: #{date}."
+      }
+    }
   end
 
   def station_valid?(abbrev)
@@ -62,9 +81,9 @@ private
 
   def validate_date
     if date.blank?
-      errors << "Please specify a departure date (e.g. '#{Date.today}')."
+      errors << error_messages[:date][:blank]
     elsif !date_valid?
-      errors << "Invalid departure date: #{date}."
+      errors << error_messages[:date][:invalid]
     end
   end
 

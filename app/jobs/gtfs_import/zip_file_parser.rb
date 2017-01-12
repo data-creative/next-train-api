@@ -6,7 +6,7 @@ class ZipFileParser
   end
 
   def read_file(entry_name)
-    entry = @zip_file.entries.find{|entry| entry.name == entry_name }
+    entry = @zip_file.entries.find{|e| e.name == entry_name }
     return entry.get_input_stream.read
   end
 
