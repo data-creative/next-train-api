@@ -33,6 +33,17 @@ RSpec.describe Stop, "validations", type: :model do
   it { should validate_uniqueness_of(:guid).scoped_to(:schedule_id) }
 end
 
+RSpec.describe Stop, ".active", type: :model do
+  let!(:stop){ create(:stop) }
+  let(:active_schedule){ create(:active_schedule)}
+  let!(:active_stop){ create(:stop, :schedule_id => active_schedule.id)}
+
+  it "returns all stops belonging to the active schedule" do
+    expect(described_class.active).to include(active_stop)
+    expect(described_class.active).to_not include(stop)
+  end
+end
+
 RSpec.describe Stop, "#location_classification", type: :model do
   let(:stop){ create(:stop, :location_code => nil)}
 

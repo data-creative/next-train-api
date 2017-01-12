@@ -43,6 +43,10 @@ RSpec.describe Api::V1::ApiController, type: :controller do
     end
 
     context "when receiving valid parameters" do
+      let(:active_schedule){ create(:active_schedule) }
+      let!(:origin){ create(:stop, :guid => "BRN", :schedule_id => active_schedule.id)}
+      let!(:destination){ create(:stop, :guid => "ST", :schedule_id => active_schedule.id)}
+
       let(:response){  get(:trains, params: {format: 'json', origin: 'BRN', destination: 'ST', date: '2016-12-28'})  }
 
       it "should indicate the query parameters it received" do

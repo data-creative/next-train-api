@@ -13,9 +13,7 @@ class Api::V1::ApiController < ApplicationController
   # @example GET /api/v1/trains.json?origin=BRN&destination=NHV
   # @example GET /api/v1/trains.json?origin=BRN&destination=NHV&date=2016-12-28
   def trains
-    options = params.permit(:origin, :destination, :date).to_h
-
-    @response ||= Api::V1::TrainsResponse.new(options)
+    @response ||= Api::V1::TrainsResponse.new(params.permit(:origin, :destination, :date).to_h)
 
     respond_to do |format|
       format.json { render json: JSON.pretty_generate(@response.to_h) }

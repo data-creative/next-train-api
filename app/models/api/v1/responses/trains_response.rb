@@ -40,7 +40,7 @@ private
     if origin.blank?
       errors << "Please specify an origin station abbreviation (e.g. 'BRN')."
     elsif !station_valid?(origin)
-      errors << "Invalid origin station abbreviation."
+      errors << "Invalid origin station abbreviation: #{origin}. Expecting one of: #{station_abbrevs}."
     end
   end
 
@@ -48,7 +48,7 @@ private
     if destination.blank?
       errors << "Please specify a destination station abbreviation (e.g. 'NHV')."
     elsif !station_valid?(destination)
-      errors << "Invalid destination station abbreviation."
+      errors << "Invalid destination station abbreviation: #{destination}. Expecting one of: #{station_abbrevs}."
     end
   end
 
@@ -57,14 +57,14 @@ private
   end
 
   def station_abbrevs
-    ["NHV","ST","BRN","GUIL","MAD","CLIN","WES","OSB","NLC"] #TODO: if possible, avoid hard-coding while at the same time avoiding a database call
+    @station_abbrevs ||= Stop.active.map(&:guid).sort #TODO: to reduce response times, avoid calling the database, if possible, but how? hopefully not hard-coding the array and creating developer notifications when it needs to change. instead, can the array be cached somehow after successful schedule activation? yes, maybe reading and writing from a json file...
   end
 
   def validate_date
     if date.blank?
       errors << "Please specify a departure date (e.g. '#{Date.today}')."
     elsif !date_valid?
-      errors << "Invalid departure date"
+      errors << "Invalid departure date: #{date}."
     end
   end
 

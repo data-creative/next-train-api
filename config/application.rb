@@ -15,7 +15,9 @@ module NextTrain
     config.time_zone = 'Eastern Time (US & Canada)'
 
     #config.autoload_paths += Dir[ Rails.root.join('app', 'jobs', 'gtfs_import', '**/') ]
-    #config.autoload_paths += Dir[ Rails.root.join('app', 'models', 'api', 'v1', '**/') ]
-    config.autoload_paths += Dir[ Rails.root.join('app', 'models', 'api', 'v1', 'responses') ]
+    #config.eager_load_paths += Dir[ Rails.root.join('app', 'jobs', 'gtfs_import', '**/') ]
+
+    #config.autoload_paths += Dir[ Rails.root.join('app', 'models', 'api', 'v1', 'responses') ]
+    #config.eager_load_paths += Dir[ Rails.root.join('app', 'models', 'api', 'v1', 'responses') ]
   end
 end

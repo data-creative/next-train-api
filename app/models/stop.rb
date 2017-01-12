@@ -8,6 +8,10 @@ class Stop < ApplicationRecord
   validates_inclusion_of :wheelchair_code, :in => [0,1,2], :allow_nil => true
   validates_uniqueness_of :guid, :scope => :schedule_id
 
+  def self.active
+    joins(:schedule).where(:schedules => {:active => true})
+  end
+
   LOCATION_CLASSIFICATIONS = {
     0 => {name:"Stop", description:"A location where passengers board or disembark from a transit vehicle."},
     1 => {name:"Station", description:"A physical structure or area that contains one or more stop."}
