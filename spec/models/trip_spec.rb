@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Trip, "association", type: :model do
+RSpec.describe Trip, "associations", type: :model do
   it { should belong_to(:schedule) }
   it { should belong_to(:route) }
   it { should belong_to(:calendar) }

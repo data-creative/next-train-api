@@ -1,7 +1,7 @@
 class Calendar < ApplicationRecord
   belongs_to :schedule, :inverse_of => :calendars
   #TODO; has_many :calendar_dates ...
-  has_many :trips, ->(calendar){ where("trips.schedule_id = ?", calendar.schedule_id) }, :inverse_of => :calendar, :primary_key => :service_guid, :foreign_key => :service_guid, :dependent => :destroy
+  has_many :trips, ->{ joins("JOIN trips ON trips.schedule_id = calendars.schedule_id") }, :inverse_of => :calendar, :primary_key => :service_guid, :foreign_key => :service_guid, :dependent => :destroy
 
   validates_associated :schedule
   validates_presence_of :schedule_id, :service_guid, :start_date, :end_date

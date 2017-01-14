@@ -1,6 +1,6 @@
 class Stop < ApplicationRecord
   belongs_to :schedule, :inverse_of => :stops
-  has_many :stop_times, ->(stop){ where("stop_times.schedule_id = ?", stop.schedule_id) }, :inverse_of => :stop, :primary_key => :guid, :foreign_key => :stop_guid, :dependent => :destroy
+  has_many :stop_times, ->{ joins("JOIN stop_times ON stop_times.schedule_id = stops.schedule_id") }, :inverse_of => :stop, :primary_key => :guid, :foreign_key => :stop_guid, :dependent => :destroy
 
   validates_associated :schedule
   validates_presence_of :schedule_id, :guid, :name, :latitude, :longitude
