@@ -21,3 +21,7 @@ RSpec.describe StopTime, "validations", type: :model do
   subject { create(:stop_time) } # line below needs this to avoid Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::ExistingRecordInvalid. not sure if the expectations above this line are affected...
   it { should validate_uniqueness_of(:stop_guid).scoped_to(:schedule_id, :trip_guid) }
 end
+
+RSpec.describe StopTime, ".trips_stopping_in_sequence" do
+  pending "todo"
+end

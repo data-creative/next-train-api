@@ -12,8 +12,12 @@ class Schedule < ApplicationRecord
   validates_uniqueness_of :published_at, :scope => :source_url
   validate :at_most_one_active_schedule
 
+  def self.is_active
+    where(:active => true)
+  end
+
   def self.active
-    where(:active => true).first
+    is_active.first
   end
 
   def activate!

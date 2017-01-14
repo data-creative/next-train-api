@@ -77,9 +77,9 @@ private
     Date.valid_date?(y.to_i, m.to_i, d.to_i)
   end
 
-  def raw_results
-    #TODO: convert this query into ActiveRecord syntax and ensure protection from SQL injection
-    sql = <<-SQL
+=begin
+  def sql
+    <<-SQL
       SELECT
         c.schedule_id
         ,c.service_guid
@@ -91,7 +91,7 @@ private
         ,st.arrival_time
         ,st.departure_time
       FROM calendars c
-      LEFT JOIN trips t ON t.service_guid = c.service_guid AND c.schedule_id = t.schedule_id
+      JOIN trips t ON t.service_guid = c.service_guid AND c.schedule_id = t.schedule_id
       JOIN (
         -- find all trips that include both stops and in the proper order/direction:
         SELECT
@@ -109,14 +109,28 @@ private
         AND '#{date}' BETWEEN c.start_date AND c.end_date
       ORDER BY t.guid, stop_sequence
     SQL
-
-    ActiveRecord::Base.connection.exec_query(sql)
   end
 
+  def raw_results
+    ActiveRecord::Base.connection.exec_query(sql)
+  end
+=end
+
+  def raw_results
+    Trip.stopping_in_sequence(:from => origin, :to => destination)
+      .joins(:calendar).merge(Calendar.in_service_on(date))
+      .joins(:schedule).merge(Schedule.is_active)
+      .joins(:stop_times)
+      .select("calendars.schedule_id
+        ,schedules.published_at
+        ,calendars.service_guid
+        ,trips.guid AS trip_guid ,trips.route_guid ,trips.headsign AS trip_headsign
+        ,stop_times.stop_sequence ,stop_times.stop_guid ,stop_times.arrival_time ,stop_times.departure_time"
+      )
+  end #TODO: add or subtract additional calendar dates from the service
+
   def nested_results
-    raw_results.group_by{|h|
-      h.select{|k,_| ["schedule_id", "route_guid", "service_guid", "trip_guid","trip_headsign"].include?(k) }
-    }
+    raw_results.group_by{|h| h.select{|k,_| ["schedule_id","route_guid","service_guid","trip_guid","trip_headsign"].include?(k) } }
   end
 
   def query_results
@@ -135,7 +149,7 @@ private
     return formatted_results
   end
 
-  def day_of_week
-    Date.parse(date).strftime("%A").downcase
-  end
+  #def day_of_week
+  #  Date.parse(date).strftime("%A").downcase
+  #end
 end

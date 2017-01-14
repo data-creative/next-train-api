@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Trip, "association", type: :model do
   it { should belong_to(:schedule) }
   it { should belong_to(:route) }
-  #it { should belong_to(:service) }
+  it { should belong_to(:calendar) }
   it { should have_many(:stop_times).dependent(:destroy) }
 
   describe "when having many stop times" do
@@ -33,4 +33,8 @@ RSpec.describe Trip, "validations", type: :model do
 
   subject { create(:trip) } # line below needs this to avoid Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::ExistingRecordInvalid. not sure if the expectations above this line are affected...
   it { should validate_uniqueness_of(:guid).scoped_to(:schedule_id) }
+end
+
+RSpec.describe Trip, ".traveling_in_direction" do
+  pending "todo"
 end
