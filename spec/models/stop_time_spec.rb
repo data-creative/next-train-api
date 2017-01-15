@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe StopTime, "association", type: :model do
+RSpec.describe StopTime, "associations", type: :model do
   it { should belong_to(:schedule) }
   it { should belong_to(:trip) }
   it { should belong_to(:stop) }

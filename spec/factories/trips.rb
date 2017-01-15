@@ -3,7 +3,7 @@ FactoryGirl.define do
     schedule
     guid "16hundred" #NOTE: "1600" triggers Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::NonCaseSwappableValueError
     route
-    service_guid "WD"
+    calendar
     headsign "Eastbound"
   end
 
