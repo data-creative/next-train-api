@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe CalendarDate, "associations", type: :model do
   it { should belong_to(:schedule) }
+  it { should belong_to(:calendar) }
 end
 
 RSpec.describe CalendarDate, "validations", type: :model do

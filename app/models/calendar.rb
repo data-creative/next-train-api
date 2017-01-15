@@ -1,5 +1,6 @@
 class Calendar < ApplicationRecord
   belongs_to :schedule, :inverse_of => :calendars
+  has_many :calendar_dates, ->(calendar){ where("calendar_dates.schedule_id = ?", calendar.schedule_id) }, :inverse_of => :calendar, :primary_key => :service_guid, :foreign_key => :service_guid, :dependent => :destroy
   has_many :trips, ->(calendar){ where("trips.schedule_id = ?", calendar.schedule_id) }, :inverse_of => :calendar, :primary_key => :service_guid, :foreign_key => :service_guid, :dependent => :destroy
 
   validates_associated :schedule

@@ -2,7 +2,22 @@ require 'rails_helper'
 
 RSpec.describe Calendar, "associations", type: :model do
   it { should belong_to(:schedule) }
+  it { should have_many(:calendar_dates).dependent(:destroy) }
   it { should have_many(:trips).dependent(:destroy) }
+
+  describe "when having many calendar dates" do
+    let(:schedule){ create(:schedule, :id => 123) }
+    let(:calendar){ create(:calendar, :schedule_id => schedule.id) }
+    let(:calendar_date){ create(:calendar_date, :schedule_id => schedule.id, :service_guid => calendar.service_guid) }
+
+    let(:other_schedule){ create(:schedule, :id => 456) }
+    let(:calendar_date_from_another_schedule){ create(:calendar_date, :schedule_id => other_schedule.id, :service_guid => calendar.service_guid)} # the point is here that both calendar_dates share the same calendar, as if they are just different versions of the same record, but belonging to a different schedules
+
+    it "should have only those belonging to the same schedule as it" do
+      expect(calendar.calendar_dates).to include(calendar_date)
+      expect(calendar.calendar_dates).to_not include(calendar_date_from_another_schedule)
+    end
+  end
 
   describe "when having many trips" do
     let(:schedule){ create(:schedule, :id => 123) }

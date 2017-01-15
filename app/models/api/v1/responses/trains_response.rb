@@ -91,7 +91,7 @@ private
         ,st.arrival_time
         ,st.departure_time
       FROM calendars c
-      LEFT JOIN trips t ON t.service_guid = c.service_guid AND c.schedule_id = t.schedule_id
+      JOIN trips t ON t.service_guid = c.service_guid AND c.schedule_id = t.schedule_id
       JOIN (
         -- find all trips that include both stops and in the proper order/direction:
         SELECT
@@ -104,7 +104,7 @@ private
           AND instr(stops_in_sequence, '#{origin}') < instr(stops_in_sequence, '#{destination}') -- ensures proper trip direction
         ORDER BY trip_guid
       ) trip_stops ON trip_stops.trip_guid = t.guid
-      LEFT JOIN stop_times st ON st.trip_guid = t.guid AND st.schedule_id = t.schedule_id
+      JOIN stop_times st ON st.trip_guid = t.guid AND st.schedule_id = t.schedule_id
       WHERE #{day_of_week} = TRUE
         AND '#{date}' BETWEEN c.start_date AND c.end_date
       ORDER BY t.guid, stop_sequence
