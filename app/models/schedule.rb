@@ -16,15 +16,19 @@ class Schedule < ApplicationRecord
     where(:active => true)
   end
 
+  def self.active_one
+    active.first
+  end
+
   def activate!
-    self.class.active.update!(:active => false) if self.class.active.first
+    self.class.active_one.update!(:active => false) if self.class.active.first
     update!(:active => true)
   end
 
   private
 
   def at_most_one_active_schedule
-    if self.active? && self.class.active.first && self.class.active.first.id != id
+    if self.active? && self.class.active_one && self.class.active_one.id != id
       errors.add(:active, "can only describe a single schedule. please deactivate other schedule(s) before attempting to activate this one.")
     end
   end
