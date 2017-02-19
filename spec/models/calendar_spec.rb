@@ -65,7 +65,6 @@ RSpec.describe Calendar, ".in_service_on", type: :model do
 
   let(:old_schedule){ create(:inactive_schedule) }
   let(:old_calendar){ create(:calendar, :all_days, :schedule_id => old_schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
-  #let(:old_empty_calendar){ create(:calendar, :no_days, :schedule_id => old_schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
 
   describe "active schedule conditions" do
     it "should include calendars belonging to the active schedule" do
@@ -79,75 +78,71 @@ RSpec.describe Calendar, ".in_service_on", type: :model do
     end
   end
 
-  #describe "service date conditions" do
-
-  #end
-
-  it "should include calendars starting before and ending after the specified date" do
-    calendar
-    expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
-  end
-
-  it "should be inclusive, returning calendars starting or ending on the specified date" do
-    calendar
-    expect(described_class.in_service_on(service_start_date.to_s)).to_not be_empty
-    expect(described_class.in_service_on(service_end_date.to_s)).to_not be_empty
-  end #NOTE: GTFS specification says the end_date "is included in the service interval."
-
-  it "should not include calendars starting after or ending before the specified date" do
-    calendar
-    expect(described_class.in_service_on(pre_service_date.to_s)).to be_empty
-    expect(described_class.in_service_on(post_service_date.to_s)).to be_empty
-  end
-
-  #describe "service date exception conditions" do
-
-  #end
-
-  context "when there is an addition exception" do
-    context "when the calendar was originally in-service on that date" do
-      let!(:additional_date){ create(:calendar_date, :addition, :exception_date => service_date,
-                                                                :service_guid => calendar.service_guid,
-                                                                :schedule_id => calendar.schedule_id)}
-
-      it "should still include the calendar as being in-service on that date" do
-        additional_date
-        expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
-      end
+  describe "service date conditions" do
+    it "should include calendars starting before and ending after the specified date" do
+      calendar
+      expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
     end
 
-    context "when the calendar was not originally in-service on that date" do
-      let!(:additional_date){ create(:calendar_date, :addition, :exception_date => service_date,
-                                                                :service_guid => empty_calendar.service_guid,
-                                                                :schedule_id => empty_calendar.schedule_id)}
+    it "should be inclusive, returning calendars starting or ending on the specified date" do
+      calendar
+      expect(described_class.in_service_on(service_start_date.to_s)).to_not be_empty
+      expect(described_class.in_service_on(service_end_date.to_s)).to_not be_empty
+    end #NOTE: GTFS specification says the end_date "is included in the service interval."
 
-      it "should now include the calendar as being in-service on that date" do
-        additional_date
-        expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
-      end
+    it "should not include calendars starting after or ending before the specified date" do
+      calendar
+      expect(described_class.in_service_on(pre_service_date.to_s)).to be_empty
+      expect(described_class.in_service_on(post_service_date.to_s)).to be_empty
     end
   end
 
-  context "when there is a removal exception" do
-    context "when the calendar was originally in-service on that date" do
-      let!(:removed_date){ create(:calendar_date, :removal, :exception_date => service_date,
-                                                                :service_guid => calendar.service_guid,
-                                                                :schedule_id => calendar.schedule_id)}
+  describe "service date exception conditions" do
+    context "when there is an addition exception" do
+      context "when the calendar was originally in-service on that date" do
+        let!(:additional_date){ create(:calendar_date, :addition, :exception_date => service_date,
+                                                                  :service_guid => calendar.service_guid,
+                                                                  :schedule_id => calendar.schedule_id)}
 
-      it "should no longer include the calendar as being in-service on that date" do
-        removed_date
-        expect(described_class.in_service_on(service_date.to_s)).to be_empty
+        it "should still include the calendar as being in-service on that date" do
+          additional_date
+          expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
+        end
+      end
+
+      context "when the calendar was not originally in-service on that date" do
+        let!(:additional_date){ create(:calendar_date, :addition, :exception_date => service_date,
+                                                                  :service_guid => empty_calendar.service_guid,
+                                                                  :schedule_id => empty_calendar.schedule_id)}
+
+        it "should now include the calendar as being in-service on that date" do
+          additional_date
+          expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
+        end
       end
     end
 
-    context "when the calendar was not originally in-service on that date" do
-      let!(:removed_date){ create(:calendar_date, :removal, :exception_date => service_date,
-                                                                :service_guid => empty_calendar.service_guid,
-                                                                :schedule_id => empty_calendar.schedule_id)}
+    context "when there is a removal exception" do
+      context "when the calendar was originally in-service on that date" do
+        let!(:removed_date){ create(:calendar_date, :removal, :exception_date => service_date,
+                                                                  :service_guid => calendar.service_guid,
+                                                                  :schedule_id => calendar.schedule_id)}
 
-      it "should still not include the calendar as being in-service on that date" do
-        removed_date
-        expect(described_class.in_service_on(service_date.to_s)).to be_empty
+        it "should no longer include the calendar as being in-service on that date" do
+          removed_date
+          expect(described_class.in_service_on(service_date.to_s)).to be_empty
+        end
+      end
+
+      context "when the calendar was not originally in-service on that date" do
+        let!(:removed_date){ create(:calendar_date, :removal, :exception_date => service_date,
+                                                                  :service_guid => empty_calendar.service_guid,
+                                                                  :schedule_id => empty_calendar.schedule_id)}
+
+        it "should still not include the calendar as being in-service on that date" do
+          removed_date
+          expect(described_class.in_service_on(service_date.to_s)).to be_empty
+        end
       end
     end
   end
