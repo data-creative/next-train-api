@@ -59,9 +59,10 @@ RSpec.describe Calendar, ".in_service_on", type: :model do
   let(:service_start_date){ "2017-01-01".to_date }
   let(:service_end_date){ "2017-12-31".to_date }
   let(:calendar){ create(:calendar, :all_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
+
   let(:date_in_service){ rand(service_start_date..service_end_date) }
   let(:date_before_service_starts){ service_start_date - 10.days }
-  let(:date_after_service_ends){ service_start_date + 10.days }
+  let(:date_after_service_ends){ service_end_date + 10.days }
 
   it "should include calendars starting before and ending after the specified date" do
     calendar

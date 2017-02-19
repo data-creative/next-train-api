@@ -40,7 +40,7 @@ class Calendar < ApplicationRecord
     #  .where("calendar_dates.exception_code <> 2 OR calendar_dates.exception_code IS NULL") # handle removals
 
     active
-      .where("? = true", day_of_week(date))
+      .where(day_of_week(date).to_sym => true)
       .where("? BETWEEN calendars.start_date AND calendars.end_date", date)
   end
 end
