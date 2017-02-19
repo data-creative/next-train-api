@@ -53,17 +53,35 @@ RSpec.describe Calendar, "validations", type: :model do
 end
 
 RSpec.describe Calendar, ".in_service_on", type: :model do
-  # todo: differentiate between calendars belonging to active vs inactive schedules
-
-  let(:schedule){ create(:active_schedule) }
   let(:service_start_date){ "2017-01-01".to_date }
   let(:service_end_date){ "2017-12-31".to_date }
-  let(:calendar){ create(:calendar, :all_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
-  let(:empty_calendar){ create(:calendar, :no_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
-
   let(:service_date){ rand(service_start_date..service_end_date) }
   let(:pre_service_date){ service_start_date - 10.days }
   let(:post_service_date){ service_end_date + 10.days }
+
+  let(:schedule){ create(:active_schedule) }
+  let(:calendar){ create(:calendar, :all_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
+  let(:empty_calendar){ create(:calendar, :no_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
+
+  let(:old_schedule){ create(:inactive_schedule) }
+  let(:old_calendar){ create(:calendar, :all_days, :schedule_id => old_schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
+  #let(:old_empty_calendar){ create(:calendar, :no_days, :schedule_id => old_schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
+
+  describe "active schedule conditions" do
+    it "should include calendars belonging to the active schedule" do
+      calendar
+      expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
+    end
+
+    it "should not include calendars belonging to an inactive schedule" do
+      old_calendar
+      expect(described_class.in_service_on(service_date.to_s)).to be_empty
+    end
+  end
+
+  #describe "service date conditions" do
+
+  #end
 
   it "should include calendars starting before and ending after the specified date" do
     calendar
@@ -81,6 +99,10 @@ RSpec.describe Calendar, ".in_service_on", type: :model do
     expect(described_class.in_service_on(pre_service_date.to_s)).to be_empty
     expect(described_class.in_service_on(post_service_date.to_s)).to be_empty
   end
+
+  #describe "service date exception conditions" do
+
+  #end
 
   context "when there is an addition exception" do
     context "when the calendar was originally in-service on that date" do

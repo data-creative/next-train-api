@@ -9,6 +9,10 @@ FactoryGirl.define do
       active true
     end
 
+    factory :inactive_schedule do
+      active false
+    end
+
     #trait :inactive do
     #  active false
     #end
