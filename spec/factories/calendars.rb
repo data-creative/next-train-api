@@ -21,7 +21,7 @@ FactoryGirl.define do
       saturday true
       sunday true
     end
-=begin
+
     trait :no_days do
       monday false
       tuesday false
@@ -31,6 +31,8 @@ FactoryGirl.define do
       saturday false
       sunday false
     end
+
+=begin
 
     trait :weekdays do
       monday true

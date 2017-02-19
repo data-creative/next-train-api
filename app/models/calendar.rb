@@ -29,18 +29,20 @@ class Calendar < ApplicationRecord
 
   # @param [String] date A date-string in YYYY-MM-DD format.
   def self.in_service_on(date)
-    #joins(:calendar_dates_join)
+    #active
+    #  .where(day_of_week(date).to_sym => true)
     #  .where("? BETWEEN calendars.start_date AND calendars.end_date", date)
-    #  .where("? = true OR calendar_dates.exception_code = 1", day_of_week(date)) # handle additions
-    #  .where("calendar_dates.exception_code <> 2 OR calendar_dates.exception_code IS NULL") # handle removals
 
-    #joins("LEFT JOIN calendar_dates ON calendar_dates.service_guid = calendars.service_guid AND calendar_dates.schedule_id = calendars.schedule_id")
-    #  .where("? BETWEEN calendars.start_date AND calendars.end_date", date)
-    #  .where("? = true OR calendar_dates.exception_code = 1", day_of_week(date)) # handle additions
-    #  .where("calendar_dates.exception_code <> 2 OR calendar_dates.exception_code IS NULL") # handle removals
+    unionable_selections = "schedules.id AS schedule_id, calendars.id AS calendar_id, calendars.service_guid"
 
-    active
-      .where(day_of_week(date).to_sym => true)
-      .where("? BETWEEN calendars.start_date AND calendars.end_date", date)
+    calendars = Calendar.active.where("? BETWEEN calendars.start_date AND calendars.end_date", date)
+
+    calendars_in_service = calendars.where(day_of_week(date).to_sym => true).select(unionable_selections) # E0, E1, WD
+
+    calendars_added = calendars.joins("JOIN calendar_dates ON calendar_dates.service_guid = calendars.service_guid AND calendar_dates.schedule_id = calendars.schedule_id").where("calendar_dates.exception_date = ?", date).where("calendar_dates.exception_code = 1").select(unionable_selections)
+
+    union = "#{calendars_in_service.to_sql} UNION #{calendars_added.to_sql}"
+
+    Calendar.from("(#{union}) AS calendars")
   end
 end

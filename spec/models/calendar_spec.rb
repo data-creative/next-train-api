@@ -59,14 +59,15 @@ RSpec.describe Calendar, ".in_service_on", type: :model do
   let(:service_start_date){ "2017-01-01".to_date }
   let(:service_end_date){ "2017-12-31".to_date }
   let(:calendar){ create(:calendar, :all_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
+  let(:empty_calendar){ create(:calendar, :no_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
 
-  let(:date_in_service){ rand(service_start_date..service_end_date) }
-  let(:date_before_service_starts){ service_start_date - 10.days }
-  let(:date_after_service_ends){ service_end_date + 10.days }
+  let(:service_date){ rand(service_start_date..service_end_date) }
+  let(:pre_service_date){ service_start_date - 10.days }
+  let(:post_service_date){ service_end_date + 10.days }
 
   it "should include calendars starting before and ending after the specified date" do
     calendar
-    expect(described_class.in_service_on(date_in_service.to_s)).to_not be_empty
+    expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
   end
 
   it "should be inclusive, returning calendars starting or ending on the specified date" do
@@ -77,40 +78,30 @@ RSpec.describe Calendar, ".in_service_on", type: :model do
 
   it "should not include calendars starting after or ending before the specified date" do
     calendar
-    expect(described_class.in_service_on(date_before_service_starts.to_s)).to be_empty
-    expect(described_class.in_service_on(date_after_service_ends.to_s)).to be_empty
+    expect(described_class.in_service_on(pre_service_date.to_s)).to be_empty
+    expect(described_class.in_service_on(post_service_date.to_s)).to be_empty
   end
 
-
-
-
-
-
-
-
-
-
-
-
-=begin
   context "when there is an addition exception" do
-    let(:exception_date){ "2017-05-13" }
-
     context "when the calendar was originally in-service on that date" do
-      let!(:in_service_calendar){ create(:calendar, :in_service, :start_date => service_start, :end_date => service_end )}
-      let!(:additional_date){ create(:calendar_date, :addition, :exception_date => exception_date, :service_guid => in_service_calendar.service_guid, :schedule_id => in_service_calendar.schedule_id)}
+      let!(:additional_date){ create(:calendar_date, :addition, :exception_date => service_date,
+                                                                :service_guid => calendar.service_guid,
+                                                                :schedule_id => calendar.schedule_id)}
 
       it "should still include the calendar as being in-service on that date" do
-        expect(described_class.in_service_on(exception_date)).to_not be_empty
+        additional_date
+        expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
       end
     end
 
     context "when the calendar was not originally in-service on that date" do
-      let!(:out_of_service_calendar){ create(:calendar, :out_of_service, :start_date => service_start, :end_date => service_end )}
-      let!(:additional_date){ create(:calendar_date, :addition, :exception_date => exception_date, :service_guid => out_of_service_calendar.service_guid, :schedule_id => out_of_service_calendar.schedule_id)}
+      let!(:additional_date){ create(:calendar_date, :addition, :exception_date => service_date,
+                                                                :service_guid => empty_calendar.service_guid,
+                                                                :schedule_id => empty_calendar.schedule_id)}
 
       it "should now include the calendar as being in-service on that date" do
-        expect(described_class.in_service_on(exception_date)).to_not be_empty
+        additional_date
+        expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
       end
     end
   end
@@ -118,7 +109,6 @@ RSpec.describe Calendar, ".in_service_on", type: :model do
 
 
 
-=end
 
 
 
