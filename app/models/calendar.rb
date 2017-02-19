@@ -37,12 +37,14 @@ class Calendar < ApplicationRecord
 
     calendars = Calendar.active.where("? BETWEEN calendars.start_date AND calendars.end_date", date)
 
-    calendars_in_service = calendars.where(day_of_week(date).to_sym => true).select(unionable_selections) # E0, E1, WD
+    calendars_in_service = calendars.where(day_of_week(date).to_sym => true).select(unionable_selections)
 
     calendars_added = calendars.joins("JOIN calendar_dates ON calendar_dates.service_guid = calendars.service_guid AND calendar_dates.schedule_id = calendars.schedule_id").where("calendar_dates.exception_date = ?", date).where("calendar_dates.exception_code = 1").select(unionable_selections)
 
     union = "#{calendars_in_service.to_sql} UNION #{calendars_added.to_sql}"
 
-    Calendar.from("(#{union}) AS calendars")
+    calendars_removed = calendars.joins("JOIN calendar_dates ON calendar_dates.service_guid = calendars.service_guid AND calendar_dates.schedule_id = calendars.schedule_id").where("calendar_dates.exception_date = ?", date).where("calendar_dates.exception_code = 2").select("DISTINCT calendars.service_guid")
+
+    Calendar.from("(#{union}) AS calendars").where("calendars.service_guid NOT IN (#{calendars_removed.to_sql})").order("calendars.service_guid")
   end
 end

@@ -106,36 +106,27 @@ RSpec.describe Calendar, ".in_service_on", type: :model do
     end
   end
 
-
-
-
-
-
-
-
-
-
-
-
-=begin
   context "when there is a removal exception" do
     context "when the calendar was originally in-service on that date" do
+      let!(:removed_date){ create(:calendar_date, :removal, :exception_date => service_date,
+                                                                :service_guid => calendar.service_guid,
+                                                                :schedule_id => calendar.schedule_id)}
+
       it "should no longer include the calendar as being in-service on that date" do
-        expect(false).to eql(true)
+        removed_date
+        expect(described_class.in_service_on(service_date.to_s)).to be_empty
       end
     end
 
     context "when the calendar was not originally in-service on that date" do
+      let!(:removed_date){ create(:calendar_date, :removal, :exception_date => service_date,
+                                                                :service_guid => empty_calendar.service_guid,
+                                                                :schedule_id => empty_calendar.schedule_id)}
+
       it "should still not include the calendar as being in-service on that date" do
-        expect(false).to eql(true)
+        removed_date
+        expect(described_class.in_service_on(service_date.to_s)).to be_empty
       end
     end
   end
-
-
-
-=end
-
-
-
 end

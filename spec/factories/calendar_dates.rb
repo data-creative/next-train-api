@@ -8,5 +8,9 @@ FactoryGirl.define do
     trait :addition do
       exception_code 1
     end
+
+    trait :removal do
+      exception_code 2
+    end
   end
 end
