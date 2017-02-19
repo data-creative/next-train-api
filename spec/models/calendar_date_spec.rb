@@ -12,6 +12,10 @@ RSpec.describe CalendarDate, "validations", type: :model do
   it { should validate_presence_of(:exception_code) }
   it { should validate_inclusion_of(:exception_code).in_array([1, 2]) }
 
-  subject { create(:calendar_date) } # line below needs this to avoid Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::ExistingRecordInvalid. not sure if the expectations above this line are affected...
-  it { should validate_uniqueness_of(:exception_date).scoped_to(:schedule_id, :service_guid) }
+  describe "instance-dependant validations" do
+    let(:calendar){ create(:calendar) }
+    subject { create(:calendar_date, :schedule_id => calendar.schedule_id, :service_guid => calendar.service_guid) } # line below needs this to avoid Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::ExistingRecordInvalid.
+
+    it { should validate_uniqueness_of(:exception_date).scoped_to(:schedule_id, :service_guid) }
+  end
 end

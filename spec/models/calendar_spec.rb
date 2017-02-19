@@ -53,27 +53,45 @@ RSpec.describe Calendar, "validations", type: :model do
 end
 
 RSpec.describe Calendar, ".in_service_on", type: :model do
-  let(:service_start){ "2017-01-01".to_date }
-  let(:service_end){ "2017-12-31".to_date }
-  let(:in_service_calendar){ create(:calendar, :in_service, :start_date => service_start, :end_date => service_end )}
+  # todo: differentiate between calendars belonging to active vs inactive schedules
+
+  let(:schedule){ create(:active_schedule) }
+  let(:service_start_date){ "2017-01-01".to_date }
+  let(:service_end_date){ "2017-12-31".to_date }
+  let(:calendar){ create(:calendar, :all_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
+  let(:date_in_service){ rand(service_start_date..service_end_date) }
+  let(:date_before_service_starts){ service_start_date - 10.days }
+  let(:date_after_service_ends){ service_start_date + 10.days }
 
   it "should include calendars starting before and ending after the specified date" do
-    in_service_calendar
-    expect(described_class.in_service_on("2017-07-07")).to_not be_empty
+    calendar
+    expect(described_class.in_service_on(date_in_service.to_s)).to_not be_empty
   end
 
   it "should be inclusive, returning calendars starting or ending on the specified date" do
-    in_service_calendar
-    expect(described_class.in_service_on("2017-01-01")).to_not be_empty
-    expect(described_class.in_service_on("2017-12-31")).to_not be_empty
+    calendar
+    expect(described_class.in_service_on(service_start_date.to_s)).to_not be_empty
+    expect(described_class.in_service_on(service_end_date.to_s)).to_not be_empty
   end #NOTE: GTFS specification says the end_date "is included in the service interval."
 
   it "should not include calendars starting after or ending before the specified date" do
-    in_service_calendar
-    expect(described_class.in_service_on("2016-06-06")).to be_empty
-    expect(described_class.in_service_on("2018-08-08")).to be_empty
+    calendar
+    expect(described_class.in_service_on(date_before_service_starts.to_s)).to be_empty
+    expect(described_class.in_service_on(date_after_service_ends.to_s)).to be_empty
   end
 
+
+
+
+
+
+
+
+
+
+
+
+=begin
   context "when there is an addition exception" do
     let(:exception_date){ "2017-05-13" }
 
@@ -99,7 +117,7 @@ RSpec.describe Calendar, ".in_service_on", type: :model do
 
 
 
-
+=end
 
 
 

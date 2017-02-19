@@ -13,18 +13,18 @@ class Schedule < ApplicationRecord
   validate :at_most_one_active_schedule
 
   def self.active
-    where(:active => true).first
+    where(:active => true)
   end
 
   def activate!
-    self.class.active.update!(:active => false) if self.class.active.present?
+    self.class.active.update!(:active => false) if self.class.active.first
     update!(:active => true)
   end
 
   private
 
   def at_most_one_active_schedule
-    if self.active? && self.class.active.present? && self.class.active.id != id
+    if self.active? && self.class.active.first && self.class.active.first.id != id
       errors.add(:active, "can only describe a single schedule. please deactivate other schedule(s) before attempting to activate this one.")
     end
   end

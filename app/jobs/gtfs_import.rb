@@ -46,7 +46,7 @@ class GtfsImport < ApplicationJob
   private
 
   def active_schedule
-    Schedule.active
+    Schedule.active.first
   end
 
   def hosted_schedule

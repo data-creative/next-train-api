@@ -9,7 +9,7 @@ class Stop < ApplicationRecord
   validates_uniqueness_of :guid, :scope => :schedule_id
 
   def self.active
-    joins(:schedule).where(:schedules => {:active => true})
+    joins(:schedule).merge(Schedule.active)
   end
 
   LOCATION_CLASSIFICATIONS = {
