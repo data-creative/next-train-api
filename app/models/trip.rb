@@ -3,6 +3,7 @@ class Trip < ApplicationRecord
   belongs_to :route, :inverse_of => :trips, :primary_key => :guid, :foreign_key => :route_guid
   belongs_to :calendar, :inverse_of => :trips, :primary_key => :service_guid, :foreign_key => :service_guid
   has_many :stop_times, ->(trip){ where("stop_times.schedule_id = ?", trip.schedule_id) }, :inverse_of => :trip, :primary_key => :guid, :foreign_key => :trip_guid, :dependent => :destroy
+
   #has_many :joined_stop_times, ->{ where("stop_times.schedule_id = trips.schedule_id") },
   #          #:inverse_of => :trip,
   #          :class_name => "StopTime",
@@ -18,4 +19,16 @@ class Trip < ApplicationRecord
   validates_inclusion_of :wheelchair_code, :in => [0,1,2], :allow_nil => true
   validates_inclusion_of :bicycle_code, :in => [0,1,2], :allow_nil => true
   validates_uniqueness_of :guid, :scope => :schedule_id
+
+  #def self.joins_cal
+  #  joins("JOIN calendars on trips.schedule_id = calendars.schedule_id AND trips.service_guid = calendars.service_guid")
+  #end
+
+  # @param [String] date A date-string in YYYY-MM-DD format.
+  def self.in_service_on(date)
+    #joins_cal.merge(Calendar.in_service_on(date)).select("calendars.schedule_id ,calendars.calendar_id ,calendars.service_guid
+    #                                                          ,trips.guid AS trip_guid ,trips.route_guid ,trips.headsign".squish)
+
+    Calendar.in_service_on(date).joins_trips.select("calendars.schedule_id ,calendars.calendar_id ,calendars.service_guid ,trips.guid AS trip_guid ,trips.route_guid ,trips.headsign")
+  end
 end

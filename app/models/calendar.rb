@@ -27,6 +27,10 @@ class Calendar < ApplicationRecord
     joins(:schedule).merge(Schedule.active)
   end
 
+  def self.joins_trips
+    joins("JOIN trips on trips.schedule_id = calendars.schedule_id AND trips.service_guid = calendars.service_guid")
+  end
+
   # @param [String] date A date-string in YYYY-MM-DD format.
   def self.in_service_on(date)
     #active

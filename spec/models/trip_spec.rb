@@ -34,3 +34,27 @@ RSpec.describe Trip, "validations", type: :model do
   subject { create(:trip) } # line below needs this to avoid Shoulda::Matchers::ActiveRecord::ValidateUniquenessOfMatcher::ExistingRecordInvalid. not sure if the expectations above this line are affected...
   it { should validate_uniqueness_of(:guid).scoped_to(:schedule_id) }
 end
+
+RSpec.describe Trip, ".in_service_on" do
+  let(:service_start_date){ "2017-01-01".to_date }
+  let(:service_end_date){ "2017-12-31".to_date }
+  let(:service_date){ rand(service_start_date..service_end_date) }
+
+  let(:schedule){ create(:active_schedule) }
+
+  let(:calendar){ create(:calendar, :all_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
+  let(:trip){ create(:trip, :schedule_id => schedule.id, :calendar => calendar) }
+
+  let(:empty_calendar){ create(:calendar, :no_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
+  let(:out_of_service_trip){ create(:trip, :schedule_id => schedule.id, :calendar => empty_calendar) }
+
+  it "should include all trips belonging to in-service calendars" do
+    trip
+    expect(described_class.in_service_on(service_date.to_s)).to_not be_empty
+  end
+
+  it "should not include any trips belonging to out-of-service calendars" do
+    out_of_service_trip
+    expect(described_class.in_service_on(service_date.to_s)).to be_empty
+  end
+end
