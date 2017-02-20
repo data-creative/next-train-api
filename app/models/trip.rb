@@ -31,4 +31,16 @@ class Trip < ApplicationRecord
 
     Calendar.in_service_on(date).joins_trips.select("calendars.schedule_id ,calendars.calendar_id ,calendars.service_guid ,trips.guid AS trip_guid ,trips.route_guid ,trips.headsign")
   end
+
+  def self.traveling_in_direction(from:, to:)
+    origin, destination = from, to
+
+    trip_guids = StopTime.group("trip_guid")
+      .having("instr(stops_in_sequence, ?) <> 0", origin) # -- ensures origin station is included in the trip
+      .having("instr(stops_in_sequence, ?) <> 0", destination) # -- ensures destination station is included in the trip
+      .having("instr(stops_in_sequence, ?) < instr(stops_in_sequence, ?)", origin, destination) # -- ensures proper trip direction
+      .select("trip_guid ,group_concat(stop_guid ORDER BY stop_sequence SEPARATOR ' > ') AS stops_in_sequence")
+
+    joins("JOIN (#{trip_guids.to_sql}) trips_in_direction ON trips_in_direction.trip_guid = trips.guid")
+  end
 end

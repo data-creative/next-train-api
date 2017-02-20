@@ -58,3 +58,51 @@ RSpec.describe Trip, ".in_service_on" do
     expect(described_class.in_service_on(service_date.to_s)).to be_empty
   end
 end
+
+RSpec.describe Trip, ".traveling_in_direction" do
+  let(:earlier_stop_sequence){ 5 }
+  let(:later_stop_sequence){ earlier_stop_sequence + 3 }
+
+  let(:schedule){ create(:schedule)}
+  let(:trip){ create(:trip, :schedule_id => schedule.id) }
+  let(:origin){ create(:stop, :schedule_id => schedule.id, :guid => "ST")}
+  let(:destination){ create(:stop, :schedule_id => schedule.id, :guid => "BRN")}
+
+  let(:origin_stop_time){ create(:stop_time, :schedule_id => schedule.id, :trip_guid => trip.guid, :stop_guid => origin.guid, :stop_sequence => earlier_stop_sequence)}
+  let(:destination_stop_time){ create(:stop_time, :schedule_id => schedule.id, :trip_guid => trip.guid, :stop_guid => destination.guid, :stop_sequence => later_stop_sequence)}
+
+  describe "stop inclusion conditions" do
+    it "should include trips which stop at both the origin station and the destination station" do
+      origin_stop_time
+      destination_stop_time
+      expect(described_class.traveling_in_direction(:from => "ST", :to => "BRN")).to_not be_empty
+    end
+
+    it "should not include trips which stop at the origin but not the destination station" do
+      origin_stop_time
+      expect(described_class.traveling_in_direction(:from => "ST", :to => "BRN")).to be_empty
+    end
+
+    it "should not include trips which stop at the destination but not the origin station" do
+      destination_stop_time
+      expect(described_class.traveling_in_direction(:from => "ST", :to => "BRN")).to be_empty
+    end
+  end
+
+  describe "stop sequence conditions" do
+    let(:reverse_origin_stop_time){ create(:stop_time, :schedule_id => schedule.id, :trip_guid => trip.guid, :stop_guid => origin.guid, :stop_sequence => later_stop_sequence)}
+    let(:reverse_destination_stop_time){ create(:stop_time, :schedule_id => schedule.id, :trip_guid => trip.guid, :stop_guid => destination.guid, :stop_sequence => earlier_stop_sequence)}
+
+    it "should include trips traveling in the proper direction (based on stop sequence)" do
+      origin_stop_time
+      destination_stop_time
+      expect(described_class.traveling_in_direction(:from => "ST", :to => "BRN")).to_not be_empty
+    end
+
+    it "should not include trips traveling in the improper direction (based on stop sequence)" do
+      reverse_origin_stop_time
+      reverse_destination_stop_time
+      expect(described_class.traveling_in_direction(:from => "ST", :to => "BRN")).to be_empty
+    end
+  end
+end
