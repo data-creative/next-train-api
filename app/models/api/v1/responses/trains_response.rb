@@ -77,37 +77,103 @@ private
     Date.valid_date?(y.to_i, m.to_i, d.to_i)
   end
 
+  def day_of_week
+    Date.parse(date).strftime("%A").downcase
+  end
+
   def raw_results
-    #TODO: convert this query into ActiveRecord syntax and ensure protection from SQL injection
     sql = <<-SQL
+
+      -- TRIPS BELONGING TO ACTIVE SCHEDULES AND IN-SERVICE CALENDARS ...
+      -- ... STOPPING IN ORDER FROM ORIGIN ('ST') TO DESTINATION ('BRN') ...
+      -- ... ON A GIVEN DAY ('wednesday', '2016-11-23')
+      -- ... (~142 rows, row per stop_time, representing each of around 17 trips representing each of three calendars)
       SELECT
-        c.schedule_id
-        ,c.service_guid
-        ,t.guid AS trip_guid
-        ,t.route_guid
-        ,t.headsign AS trip_headsign
-        ,st.stop_sequence
-        ,st.stop_guid
-        ,st.arrival_time
-        ,st.departure_time
-      FROM calendars c
-      JOIN trips t ON t.service_guid = c.service_guid AND c.schedule_id = t.schedule_id
+        trips.schedule_id
+        ,trips.service_guid
+        ,trips.route_guid
+        ,trips.headsign AS trip_headsign
+        ,stop_times.trip_guid
+        ,stop_times.stop_guid
+        ,stop_times.stop_sequence
+        ,stop_times.arrival_time
+        ,stop_times.departure_time
+
+      FROM calendars
       JOIN (
-        -- find all trips that include both stops and in the proper order/direction:
-        SELECT
-         trip_guid
-         ,group_concat(stop_guid ORDER BY stop_sequence SEPARATOR ' > ') AS stops_in_sequence
-        FROM stop_times
-        GROUP BY trip_guid
-        HAVING instr(stops_in_sequence, '#{origin}') <> 0 -- ensures origin station is included in the trip
-          AND instr(stops_in_sequence, '#{destination}') <> 0 -- ensures destination station is included in the trip
-          AND instr(stops_in_sequence, '#{origin}') < instr(stops_in_sequence, '#{destination}') -- ensures proper trip direction
-        ORDER BY trip_guid
-      ) trip_stops ON trip_stops.trip_guid = t.guid
-      JOIN stop_times st ON st.trip_guid = t.guid AND st.schedule_id = t.schedule_id
-      WHERE #{day_of_week} = TRUE
-        AND '#{date}' BETWEEN c.start_date AND c.end_date
-      ORDER BY t.guid, stop_sequence
+
+        -- CALENDARS IN-SERVICE (~4 rows, one per calendar)
+        SELECT u.schedule_id, u.calendar_id, u.service_guid
+        FROM (
+
+          -- CALENDARS NORMALLY IN-SERVICE (~3 rows, one per calendar)
+          SELECT s.id AS schedule_id ,c.id AS calendar_id ,c.service_guid
+          FROM schedules s
+          JOIN calendars c ON c.schedule_id = s.id
+          WHERE s.active = TRUE
+            AND (c.#{day_of_week} = TRUE)
+            AND ('#{date}' BETWEEN c.start_date AND c.end_date)
+
+          UNION
+
+          -- CALENDARS ADDED TO SERVICE (~2 rows, one per calendar)
+          SELECT s.id AS schedule_id ,c.id AS calendar_id ,c.service_guid
+          FROM schedules s
+          JOIN calendars c ON c.schedule_id = s.id
+          JOIN calendar_dates cd ON cd.service_guid = c.service_guid AND cd.schedule_id = c.schedule_id
+          WHERE s.active = TRUE
+            AND ('#{date}' BETWEEN c.start_date AND c.end_date)
+            AND cd.exception_date = '#{date}'
+            AND cd.exception_code = 1
+
+        ) u
+        WHERE u.service_guid NOT IN (
+
+          -- CALENDARS REMOVED FROM SERVICE (~1 row, one per calender)
+          SELECT DISTINCT c.service_guid
+          FROM schedules s
+          JOIN calendars c ON c.schedule_id = s.id
+          JOIN calendar_dates cd ON cd.service_guid = c.service_guid AND cd.schedule_id = c.schedule_id
+          WHERE s.active = TRUE
+            AND ('#{date}' BETWEEN c.start_date AND c.end_date)
+            AND cd.exception_date = '#{date}'
+            AND cd.exception_code = 2
+
+        )
+
+      ) cals_in_service ON cals_in_service.calendar_id = calendars.id
+
+      JOIN trips ON trips.schedule_id = calendars.schedule_id AND trips.service_guid = calendars.service_guid
+
+      JOIN (
+
+        -- TRIPS STOPPING IN ORDER
+        SELECT trips.*
+        FROM calendars
+        JOIN trips ON trips.schedule_id = calendars.schedule_id AND trips.service_guid = calendars.service_guid
+        JOIN (
+
+          -- TRIPS WITH STOP SEQUENCES (~30 rows, one per trip)
+          SELECT
+           schedule_id
+           ,trip_guid
+           ,group_concat(stop_guid ORDER BY stop_sequence SEPARATOR ' > ') AS stops_in_sequence
+          FROM stop_times
+          JOIN schedules ON schedules.id = stop_times.schedule_id
+          WHERE schedules.active = TRUE
+          GROUP BY schedule_id, trip_guid
+          HAVING instr(stops_in_sequence, '#{origin}') <> 0 -- INCLUDES ORIGIN STATION
+            AND instr(stops_in_sequence, '#{destination}') <> 0 -- INCLUDES DESTINATION STATION
+            AND instr(stops_in_sequence, '#{origin}') < instr(stops_in_sequence, '#{destination}') -- ORIGIN BEFORE DESTINATION
+          ORDER BY trip_guid
+
+        ) stops_by_trip ON stops_by_trip.schedule_id = trips.schedule_id AND stops_by_trip.trip_guid = trips.guid
+
+      ) trips_stopping ON trips_stopping.id = trips.id
+
+      JOIN stop_times ON stop_times.schedule_id = trips.schedule_id AND stop_times.trip_guid = trips.guid
+      ORDER BY stop_times.stop_sequence
+
     SQL
 
     ActiveRecord::Base.connection.exec_query(sql)
@@ -115,7 +181,7 @@ private
 
   def nested_results
     raw_results.group_by{|h|
-      h.select{|k,_| ["schedule_id", "route_guid", "service_guid", "trip_guid","trip_headsign"].include?(k) }
+      h.select{|k,_| ["schedule_id", "route_guid", "service_guid", "trip_guid", "trip_headsign"].include?(k) }
     }
   end
 
@@ -133,9 +199,5 @@ private
     }
 
     return formatted_results
-  end
-
-  def day_of_week
-    Date.parse(date).strftime("%A").downcase
   end
 end
