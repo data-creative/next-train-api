@@ -85,8 +85,8 @@ private
     sql = <<-SQL
 
       -- TRIPS BELONGING TO ACTIVE SCHEDULES AND IN-SERVICE CALENDARS ...
-      -- ... STOPPING IN ORDER FROM ORIGIN ('ST') TO DESTINATION ('BRN') ...
-      -- ... ON A GIVEN DAY ('wednesday', '2016-11-23')
+      -- ... STOPPING IN ORDER FROM ORIGIN ('#{origin}') TO DESTINATION ('#{destination}') ...
+      -- ... ON A GIVEN DAY ('#{day_of_week}', '#{date}')
       -- ... (~142 rows, row per stop_time, representing each of around 17 trips representing each of three calendars)
       SELECT
         trips.schedule_id
