@@ -27,6 +27,7 @@
 ## Heroku
 
   + https://devcenter.heroku.com/articles/cleardb#using-ssl-with-cleardb-and-rails
+  + https://kb.heroku.com/why-am-i-seeing-a-max_questions-error-using-mysql
 
 ## Testing
 
