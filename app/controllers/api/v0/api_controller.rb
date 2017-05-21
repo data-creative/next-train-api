@@ -3,6 +3,7 @@ class Api::V0::ApiController < ApplicationController
   def index
     endpoint_params = params.permit(:hello).to_h
     endpoint_params[:hello] = "World" if endpoint_params[:hello].blank?
+
     initialize_response({:endpoint_params => endpoint_params, :resource => "Index"})
     @response[:results] = {:message => "Hello #{endpoint_params[:hello]}"}
 
@@ -14,6 +15,7 @@ class Api::V0::ApiController < ApplicationController
   def stations
     endpoint_params = params.permit(:geo).to_h
     endpoint_params[:geo] = "CT" if endpoint_params[:geo].blank?
+
     initialize_response({:endpoint_params => endpoint_params, :resource => "Stations"})
     @response[:results] = all_stations
 
@@ -27,6 +29,7 @@ class Api::V0::ApiController < ApplicationController
     endpoint_params[:origin] = "BRN" if endpoint_params[:origin].blank?
     endpoint_params[:destination] = "NHV" if endpoint_params[:destination].blank?
     endpoint_params[:date] = Date.today.to_s if endpoint_params[:date].blank?
+
     initialize_response({:endpoint_params => endpoint_params, :resource => "Trains"})
     @response[:results] = [
       {:id => 1111, :origin_departure => Time.zone.now - 90.minutes, :destination_arrival => Time.zone.now - 75.minutes},

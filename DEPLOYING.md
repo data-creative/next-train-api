@@ -17,6 +17,7 @@ heroku create next-train-staging
 heroku git:remote -a next-train-staging
 git remote rename heroku heroku-staging
 heroku config:set BUNDLE_WITHOUT="development:test:docs" -a next-train-staging
+heroku config:set GTFS_SOURCE_URL="http://www.shorelineeast.com/google_transit.zip" -a next-train-staging
 heroku addons:create cleardb:ignite -a next-train-staging
 heroku addons:create sendgrid:starter -a next-train-staging
 heroku addons:create scheduler:standard -a next-train-staging
@@ -37,6 +38,7 @@ heroku create next-train-production
 heroku git:remote -a next-train-production
 git remote rename heroku heroku-production
 heroku config:set BUNDLE_WITHOUT="development:test:docs" -a next-train-production
+heroku config:set GTFS_SOURCE_URL="http://www.shorelineeast.com/google_transit.zip" -a next-train-production
 heroku addons:create cleardb:ignite -a next-train-production
 heroku addons:create sendgrid:starter -a next-train-production
 heroku addons:create scheduler:standard -a next-train-production
@@ -59,3 +61,11 @@ Deploy from a different branch:
 git push heroku-staging my-branch:master
 git push heroku-production my-branch:master
 ````
+
+## Scheduled Jobs
+
+Both production and staging environment should schedule the following tasks:
+
+task | frequency
+--- | ---
+`rake gtfs:import` | once per hour
