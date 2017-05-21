@@ -74,17 +74,17 @@ RSpec.describe Api::V1::ApiController, type: :controller do
             :trip_guid=>"1627",
             :route_guid=>"SLE",
             :trip_headsign=>"Westbound",
-            :origin_departure=>"6:07:00",
-            :destination_arrival=>"6:20:00",
-            :all_stop_times=>[
-              {:stop_sequence=>68, :stop_guid=>"OSB", :arrival_time=>"5:37:00", :departure_time=>"5:37:00"},
-              {:stop_sequence=>69, :stop_guid=>"WES", :arrival_time=>"5:42:00", :departure_time=>"5:42:00"},
-              {:stop_sequence=>70, :stop_guid=>"CLIN", :arrival_time=>"5:47:00", :departure_time=>"5:47:00"},
-              {:stop_sequence=>71, :stop_guid=>"MAD", :arrival_time=>"5:52:00", :departure_time=>"5:52:00"},
-              {:stop_sequence=>72, :stop_guid=>"GUIL", :arrival_time=>"5:58:00", :departure_time=>"5:58:00"},
-              {:stop_sequence=>73, :stop_guid=>"BRN", :arrival_time=>"6:07:00", :departure_time=>"6:07:00"},
-              {:stop_sequence=>74, :stop_guid=>"ST", :arrival_time=>"6:20:00", :departure_time=>"6:20:00"},
-              {:stop_sequence=>75, :stop_guid=>"NHV", :arrival_time=>"6:22:00", :departure_time=>"6:22:00"}
+            :origin_departure=>"2016-12-28T06:07:00-0400",
+            :destination_arrival=>"2016-12-28T06:20:00-0400",
+            :stops=>[
+              {:stop_sequence=>68, :stop_guid=>"OSB", :arrival_time=>"2016-12-28T05:37:00-0400", :departure_time=>"2016-12-28T05:37:00-0400"},
+              {:stop_sequence=>69, :stop_guid=>"WES", :arrival_time=>"2016-12-28T05:42:00-0400", :departure_time=>"2016-12-28T05:42:00-0400"},
+              {:stop_sequence=>70, :stop_guid=>"CLIN", :arrival_time=>"2016-12-28T05:47:00-0400", :departure_time=>"2016-12-28T05:47:00-0400"},
+              {:stop_sequence=>71, :stop_guid=>"MAD", :arrival_time=>"2016-12-28T05:52:00-0400", :departure_time=>"2016-12-28T05:52:00-0400"},
+              {:stop_sequence=>72, :stop_guid=>"GUIL", :arrival_time=>"2016-12-28T05:58:00-0400", :departure_time=>"2016-12-28T05:58:00-0400"},
+              {:stop_sequence=>73, :stop_guid=>"BRN", :arrival_time=>"2016-12-28T06:07:00-0400", :departure_time=>"2016-12-28T06:07:00-0400"},
+              {:stop_sequence=>74, :stop_guid=>"ST", :arrival_time=>"2016-12-28T06:20:00-0400", :departure_time=>"2016-12-28T06:20:00-0400"},
+              {:stop_sequence=>75, :stop_guid=>"NHV", :arrival_time=>"2016-12-28T06:22:00-0400", :departure_time=>"2016-12-28T06:22:00-0400"}
             ]
           })
         end
