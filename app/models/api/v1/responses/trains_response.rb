@@ -185,16 +185,36 @@ private
     }
   end
 
+  def time_zone_offset
+    Time.zone.now.formatted_offset #> "-04:00" for Eastern Time (US & Canada)
+  end
+
+  # @param [String] time A time of day string like "16:25:00"
+  # @return [String] A datetime string like "2017-05-21T16:25:00-04:00"
+  def format_datetime(time)
+    year, month, day = date.split("-").map{|str| str.to_i } # [2017, 05, 21]
+    hour, minute, second = time.split(":").map{|str| str.to_i}
+    dt = DateTime.new(year, month, day, hour, minute, second, time_zone_offset)
+    return dt.strftime("%Y-%m-%dT%H:%M:%S%z") #> "2017-05-21T16:25:00-04:00"
+  end
+
   def query_results
-    formatted_results = nested_results.map{|trip, all_stops|
-      origin_stop_time = all_stops.find{|stop| stop["stop_guid"] == origin }
-      destination_stop_time = all_stops.find{|stop| stop["stop_guid"] == destination }
-      stop_times = all_stops.map{|stop| stop.select{|k,_| ["stop_sequence","stop_guid","arrival_time","departure_time"].include?(k) } }
+    formatted_results = nested_results.map{|trip, stops|
+      stops = stops.map{|stop|
+        {
+          stop_sequence: stop["stop_sequence"],
+          stop_guid: stop["stop_guid"],
+          arrival_time: format_datetime(stop["arrival_time"]),
+          departure_time: format_datetime(stop["departure_time"])
+        }
+      }
+      origin_stop = stops.find{|stop| stop[:stop_guid] == origin }
+      destination_stop = stops.find{|stop| stop[:stop_guid] == destination }
 
       trip.merge({
-        :origin_departure => origin_stop_time["departure_time"],
-        :destination_arrival => destination_stop_time["arrival_time"],
-        :all_stop_times => stop_times.sort_by{|stop_time| stop_time["stop_sequence"].to_i }
+        :origin_departure => origin_stop[:departure_time],
+        :destination_arrival => destination_stop[:arrival_time],
+        :stops => stops.sort_by{|stop| stop[:stop_sequence].to_i }
       })
     }
 

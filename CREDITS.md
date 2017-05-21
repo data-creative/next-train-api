@@ -66,3 +66,7 @@
 
   + http://stackoverflow.com/questions/7750769/recursively-including-all-model-subdirectories
   + http://blog.arkency.com/2014/11/dont-forget-about-eager-load-when-extending-autoload/
+
+## Ruby
+
+  + [DateTime](http://ruby-doc.org/stdlib-2.4.1/libdoc/date/rdoc/DateTime.html#method-c-strptime)
