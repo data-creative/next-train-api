@@ -36,15 +36,18 @@ class GtfsImport < ApplicationJob
         extract
         transform_and_load
         activate
+        # todo: send schedule activation (import success) email
       end
       finish
     rescue => e
       logger.error { "#{e.class} -- #{e.message}"}
       errors << {class: e.class.to_s, message: e.message}
-      # send error
+      # todo: send schedule activation error (import failure/error) email
+      # todo: send error to error-reporting service (maybe)
     end
     logger.info { results }
     results
+    # todo: send event with results
   end #TODO: destroy existing data only after activating the new schedule only after data finishes loading
 
   def results
@@ -54,6 +57,7 @@ class GtfsImport < ApplicationJob
       forced: forced?,
       started_at: started_at,
       ended_at: ended_at,
+      #hosted_schedule: hosted_schedule.serializable_hash
       errors: errors
     }
   end
