@@ -15,11 +15,11 @@ default: &default
   pool: 5
   username: <%= ENV.fetch("DATABASE_USER", "next_train") %>
   password: <%= ENV.fetch("DATABASE_PASSWORD", "next_train") %>
-  socket: <%= ENV.fetch("DATABASE_SOCKET", "/tmp/mysql.sock") %>
 
 development:
   <<: *default
   database: next_train_development
+  socket: <%= ENV.fetch("DATABASE_SOCKET", "/tmp/mysql.sock") %>
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

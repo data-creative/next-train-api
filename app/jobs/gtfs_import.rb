@@ -46,8 +46,8 @@ class GtfsImport < ApplicationJob
       # todo: send error to error-reporting service (maybe)
     end
     logger.info { results }
-    results
     # todo: send event with results
+    results
   end #TODO: destroy existing data only after activating the new schedule only after data finishes loading
 
   def results
