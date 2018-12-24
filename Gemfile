@@ -34,3 +34,8 @@ group :development do
   #gem 'spring'
   #gem 'spring-watcher-listen', '~> 2.0.0'
 end
+
+group :test do
+  gem "simplecov", "~> 0.16"
+  gem "simplecov-console", "~> 0.4"
+end
