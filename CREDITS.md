@@ -71,3 +71,7 @@
 ## Ruby
 
   + [DateTime](http://ruby-doc.org/stdlib-2.4.1/libdoc/date/rdoc/DateTime.html#method-c-strptime)
+
+## Travis
+
+  + https://docs.travis-ci.com/user/database-setup/#mysql

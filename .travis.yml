@@ -2,9 +2,16 @@ sudo: false
 language: ruby
 rvm:
   - 2.2.3
-before_install: gem install bundler -v 1.13.6
+services:
+  - mysql
+before_install:
+  - gem install bundler -v 1.13.6
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS next_train_test;'
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS next_train_test;'
 env:
   global:
+    - DATABASE_USERNAME="travis"
+    - DATABASE_PASSWORD=""
     - CC_TEST_REPORTER_ID=1ce5201f57b288a53e33ae8768ed7700578dffce593c814deceb0051bc208d24
     - COVERAGE=true
 before_script:

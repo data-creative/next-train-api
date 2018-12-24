@@ -13,8 +13,8 @@ default: &default
   adapter: mysql2
   encoding: utf8
   pool: 5
-  username: next_train
-  password: next_train
+  username: <%= ENV.fetch("DATABASE_USER", "next_train") %>
+  password: <%= ENV.fetch("DATABASE_PASSWORD", "next_train") %>
   socket: /tmp/mysql.sock
 
 development:
