@@ -15,7 +15,7 @@ default: &default
   pool: 5
   username: <%= ENV.fetch("DATABASE_USER", "next_train") %>
   password: <%= ENV.fetch("DATABASE_PASSWORD", "next_train") %>
-  socket: /tmp/mysql.sock
+  socket: <%= ENV.fetch("DATABASE_SOCKET", "/tmp/mysql.sock") %>
 
 development:
   <<: *default
@@ -27,6 +27,7 @@ development:
 test:
   <<: *default
   database: next_train_test
+  socket: <%= ENV.fetch("DATABASE_SOCKET", nil) %>
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is

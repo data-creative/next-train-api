@@ -7,7 +7,6 @@ services:
 before_install:
   - gem install bundler -v 1.13.6
   - mysql -e 'CREATE DATABASE IF NOT EXISTS next_train_test;'
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS next_train_test;'
 env:
   global:
     - DATABASE_USERNAME="travis"
