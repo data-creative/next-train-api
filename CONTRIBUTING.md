@@ -87,5 +87,11 @@ bundle exec rake db:test:prepare
 Run tests:
 
 ```` sh
-bundle exec rspec spec/
+bundle exec rspec spec
 ````
+
+Generate test coverage report:
+
+```sh
+COVERAGE=true bundle exec rspec spec
+```

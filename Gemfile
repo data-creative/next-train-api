@@ -20,6 +20,7 @@ gem 'yard', group: :docs # run `bundle exec yard doc` to parse comments and/or `
 
 group :development, :test do
   gem 'pry'
+  gem 'dotenv-rails'
   gem 'rspec-rails', '~> 3.5'
   gem 'factory_girl_rails', '~> 4.0'
   gem 'capybara', '~> 2.10.1'
@@ -32,4 +33,9 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   #gem 'spring'
   #gem 'spring-watcher-listen', '~> 2.0.0'
+end
+
+group :test do
+  gem "simplecov", "~> 0.16"
+  gem "simplecov-console", "~> 0.4"
 end

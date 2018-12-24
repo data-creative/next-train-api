@@ -62,6 +62,8 @@ RSpec.describe Api::V1::ApiController, type: :controller do
         let(:import){ GtfsImport.new(:source_url => source_url)}
         let(:first_result){ parsed_response[:results].first }
 
+        let(:time_zone_offset) { Time.zone.now.formatted_offset } #> -04:00 or -05:00 depending on DST
+
         before(:each) do
           stub_download_zip(source_url)
           import.perform
@@ -70,21 +72,22 @@ RSpec.describe Api::V1::ApiController, type: :controller do
         it "should contain results" do
           expect(parsed_response[:results]).to_not be_blank
           expect(first_result).to include({
+            :schedule_id => active_schedule.id + 1,
             :service_guid=>"WD",
             :trip_guid=>"1627",
             :route_guid=>"SLE",
             :trip_headsign=>"Westbound",
-            :origin_departure=>"2016-12-28T06:07:00-0400",
-            :destination_arrival=>"2016-12-28T06:20:00-0400",
+            :origin_departure=>"2016-12-28T06:07:00#{time_zone_offset}",
+            :destination_arrival=>"2016-12-28T06:20:00#{time_zone_offset}",
             :stops=>[
-              {:stop_sequence=>68, :stop_guid=>"OSB", :arrival_time=>"2016-12-28T05:37:00-0400", :departure_time=>"2016-12-28T05:37:00-0400"},
-              {:stop_sequence=>69, :stop_guid=>"WES", :arrival_time=>"2016-12-28T05:42:00-0400", :departure_time=>"2016-12-28T05:42:00-0400"},
-              {:stop_sequence=>70, :stop_guid=>"CLIN", :arrival_time=>"2016-12-28T05:47:00-0400", :departure_time=>"2016-12-28T05:47:00-0400"},
-              {:stop_sequence=>71, :stop_guid=>"MAD", :arrival_time=>"2016-12-28T05:52:00-0400", :departure_time=>"2016-12-28T05:52:00-0400"},
-              {:stop_sequence=>72, :stop_guid=>"GUIL", :arrival_time=>"2016-12-28T05:58:00-0400", :departure_time=>"2016-12-28T05:58:00-0400"},
-              {:stop_sequence=>73, :stop_guid=>"BRN", :arrival_time=>"2016-12-28T06:07:00-0400", :departure_time=>"2016-12-28T06:07:00-0400"},
-              {:stop_sequence=>74, :stop_guid=>"ST", :arrival_time=>"2016-12-28T06:20:00-0400", :departure_time=>"2016-12-28T06:20:00-0400"},
-              {:stop_sequence=>75, :stop_guid=>"NHV", :arrival_time=>"2016-12-28T06:22:00-0400", :departure_time=>"2016-12-28T06:22:00-0400"}
+              {:stop_sequence=>68, :stop_guid=>"OSB",   :arrival_time=>"2016-12-28T05:37:00#{time_zone_offset}", :departure_time=>"2016-12-28T05:37:00#{time_zone_offset}"},
+              {:stop_sequence=>69, :stop_guid=>"WES",   :arrival_time=>"2016-12-28T05:42:00#{time_zone_offset}", :departure_time=>"2016-12-28T05:42:00#{time_zone_offset}"},
+              {:stop_sequence=>70, :stop_guid=>"CLIN",  :arrival_time=>"2016-12-28T05:47:00#{time_zone_offset}", :departure_time=>"2016-12-28T05:47:00#{time_zone_offset}"},
+              {:stop_sequence=>71, :stop_guid=>"MAD",   :arrival_time=>"2016-12-28T05:52:00#{time_zone_offset}", :departure_time=>"2016-12-28T05:52:00#{time_zone_offset}"},
+              {:stop_sequence=>72, :stop_guid=>"GUIL",  :arrival_time=>"2016-12-28T05:58:00#{time_zone_offset}", :departure_time=>"2016-12-28T05:58:00#{time_zone_offset}"},
+              {:stop_sequence=>73, :stop_guid=>"BRN",   :arrival_time=>"2016-12-28T06:07:00#{time_zone_offset}", :departure_time=>"2016-12-28T06:07:00#{time_zone_offset}"},
+              {:stop_sequence=>74, :stop_guid=>"ST",    :arrival_time=>"2016-12-28T06:20:00#{time_zone_offset}", :departure_time=>"2016-12-28T06:20:00#{time_zone_offset}"},
+              {:stop_sequence=>75, :stop_guid=>"NHV",   :arrival_time=>"2016-12-28T06:22:00#{time_zone_offset}", :departure_time=>"2016-12-28T06:22:00#{time_zone_offset}"}
             ]
           })
         end

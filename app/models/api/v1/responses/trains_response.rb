@@ -186,7 +186,8 @@ private
   end
 
   def time_zone_offset
-    Time.zone.now.formatted_offset #> "-04:00" for Eastern Time (US & Canada)
+    Time.zone.now.formatted_offset #> "-04:00" for Eastern Time (US & Canada) # note: this was -05:00 in daylight savings time
+    #consider using the agency timezone, like ActiveSupport::TimeZone[Agency.first.timezone].formatted_offset
   end
 
   # @param [String] time A time of day string like "16:25:00"
@@ -195,7 +196,7 @@ private
     year, month, day = date.split("-").map{|str| str.to_i } # [2017, 05, 21]
     hour, minute, second = time.split(":").map{|str| str.to_i}
     dt = DateTime.new(year, month, day, hour, minute, second, time_zone_offset)
-    return dt.strftime("%Y-%m-%dT%H:%M:%S%z") #> "2017-05-21T16:25:00-04:00"
+    return dt.strftime("%Y-%m-%dT%H:%M:%S%Z") #> "2017-05-21T16:25:00-04:00"
   end
 
   def query_results

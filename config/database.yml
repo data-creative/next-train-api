@@ -13,13 +13,13 @@ default: &default
   adapter: mysql2
   encoding: utf8
   pool: 5
-  username: next_train
-  password: next_train
-  socket: /tmp/mysql.sock
+  username: <%= ENV.fetch("DATABASE_USER", "next_train") %>
+  password: <%= ENV.fetch("DATABASE_PASSWORD", "next_train") %>
 
 development:
   <<: *default
   database: next_train_development
+  socket: <%= ENV.fetch("DATABASE_SOCKET", "/tmp/mysql.sock") %>
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -27,6 +27,7 @@ development:
 test:
   <<: *default
   database: next_train_test
+  socket: <%= ENV.fetch("DATABASE_SOCKET", nil) %>
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is

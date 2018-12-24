@@ -12,9 +12,9 @@ require_relative "./gtfs_import/zip_file_parsers/trips_file_parser"
 class GtfsImport < ApplicationJob
   queue_as :default
 
-  attr_reader :schedule, :destination_path
+  attr_reader :source_url, :destination_path, :forced
 
-  GTFS_SOURCE_URL = ENV.fetch('GTFS_SOURCE_URL')
+  GTFS_SOURCE_URL = ENV.fetch('GTFS_SOURCE_URL', "OOPS")
 
   # @param [Hash] options
   # @param [Hash] options [String] source_url Points to a hosted source of transit data in GTFS format (e.g. 'http://my-site.com/gtfs/some_feed.zip').
@@ -27,20 +27,52 @@ class GtfsImport < ApplicationJob
   end
 
   def perform
-    start
-    logger.info{ "IMPORTING GTFS FEED FROM #{@source_url}" }
-    hosted_schedule.destroy if forced?
-    if hosted_schedule != active_schedule
-      delete_destination
-      extract
-      transform_and_load
-      activate
+    begin
+      start
+      logger.info { "IMPORTING GTFS FEED FROM #{source_url}" }
+      hosted_schedule.destroy if forced?
+      if hosted_schedule != active_schedule
+        delete_destination
+        extract
+        transform_and_load
+        activate
+        # todo: send schedule activation (import success) email
+      end
+      finish
+    rescue => e
+      logger.error { "#{e.class} -- #{e.message}"}
+      errors << {class: e.class.to_s, message: e.message}
+      # todo: send schedule activation error (import failure/error) email
+      # todo: send error to error-reporting service (maybe)
     end
-    finish
+    logger.info { results }
+    # todo: send event with results
+    results
   end #TODO: destroy existing data only after activating the new schedule only after data finishes loading
 
+  def results
+    {
+      source_url: source_url,
+      destination_path: destination_path,
+      forced: forced?,
+      started_at: started_at,
+      ended_at: ended_at,
+      #hosted_schedule: hosted_schedule.serializable_hash
+      errors: errors
+    }
+  end
+
   def forced?
-    @forced == true
+    forced == true
+  end
+
+  def hosted_schedule
+    Schedule.where({
+      :source_url => source_url,
+      :published_at => headers["last-modified"].first.to_datetime,
+      :content_length => headers["content-length"].first.to_i,
+      :etag => headers["etag"].first.tr('"','')
+    }).first_or_create!
   end
 
   private
@@ -49,17 +81,8 @@ class GtfsImport < ApplicationJob
     Schedule.active_one
   end
 
-  def hosted_schedule
-    @schedule = Schedule.where({
-      :source_url => @source_url,
-      :published_at => headers["last-modified"].first.to_datetime,
-      :content_length => headers["content-length"].first.to_i,
-      :etag => headers["etag"].first.tr('"','')
-    }).first_or_create!
-  end
-
   def response
-    @response ||= HTTParty.get(@source_url)
+    @response ||= HTTParty.get(source_url)
   end
 
   def headers
@@ -67,18 +90,18 @@ class GtfsImport < ApplicationJob
   end
 
   def delete_destination
-    FileUtils.rm_rf(@destination_path)
+    FileUtils.rm_rf(destination_path)
   end
 
   def extract
-    File.open(@destination_path, "wb") do |zip_file|
+    File.open(destination_path, "wb") do |zip_file|
       zip_file.write(response.body)
     end
   end
 
   def transform_and_load
-    Zip::File.open(@destination_path) do |zip_file|
-      options = {:zip_file => zip_file, :schedule => schedule, :logger => logger}
+    Zip::File.open(destination_path) do |zip_file|
+      options = {:zip_file => zip_file, :schedule => hosted_schedule, :logger => logger}
       AgencyFileParser.new(options).perform
       CalendarsFileParser.new(options).perform
       CalendarDatesFileParser.new(options).perform
@@ -91,6 +114,7 @@ class GtfsImport < ApplicationJob
 
   def activate
     logger.info{ "ACTIVATING SCHEDULE" }
-    schedule.activate!
+    hosted_schedule.activate!
   end
+
 end

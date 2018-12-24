@@ -4,6 +4,7 @@ class Route < ApplicationRecord
 
   validates_associated :schedule
   validates_presence_of :schedule_id, :guid, :short_name, :long_name, :code
+  #validate validate_short_or_long_name
   validates_inclusion_of :code, :in => (0..7).to_a
   validates_uniqueness_of :guid, :scope => :schedule_id
 
@@ -21,4 +22,11 @@ class Route < ApplicationRecord
   def classification
     CLASSIFICATIONS[code]
   end
+
+  #private
+#
+  #def validate_short_or_long_name
+  #  errors.add(:___, "") unless short_name || long_name
+  #end
+
 end

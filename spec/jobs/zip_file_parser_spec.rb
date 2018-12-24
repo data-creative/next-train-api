@@ -10,7 +10,7 @@ RSpec.describe ZipFileParser, "#read_file" do
       return zip_file
     end
   }
-  let(:options){ {:zip_file => zip_file, :schedule => import.schedule} }
+  let(:options){ {:zip_file => zip_file, :schedule => import.hosted_schedule} }
   let(:result){ described_class.new(options).read_file("agency.txt") }
 
   before(:each) do
