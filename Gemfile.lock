@@ -60,6 +60,10 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.2.5)
+    dotenv (2.5.0)
+    dotenv-rails (2.5.0)
+      dotenv (= 2.5.0)
+      railties (>= 3.2, < 6.0)
     erubis (2.7.0)
     execjs (2.7.0)
     factory_girl (4.7.0)
@@ -197,6 +201,7 @@ PLATFORMS
 DEPENDENCIES
   capybara (~> 2.10.1)
   devise (~> 4.2.0)
+  dotenv-rails
   factory_girl_rails (~> 4.0)
   httparty (~> 0.13.3)
   jbuilder (~> 2.5)

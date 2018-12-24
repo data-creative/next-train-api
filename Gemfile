@@ -20,6 +20,7 @@ gem 'yard', group: :docs # run `bundle exec yard doc` to parse comments and/or `
 
 group :development, :test do
   gem 'pry'
+  gem 'dotenv-rails'
   gem 'rspec-rails', '~> 3.5'
   gem 'factory_girl_rails', '~> 4.0'
   gem 'capybara', '~> 2.10.1'
