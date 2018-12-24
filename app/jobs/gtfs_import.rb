@@ -14,7 +14,7 @@ class GtfsImport < ApplicationJob
 
   attr_reader :source_url, :destination_path, :forced
 
-  GTFS_SOURCE_URL = ENV.fetch('GTFS_SOURCE_URL')
+  GTFS_SOURCE_URL = ENV.fetch('GTFS_SOURCE_URL', "OOPS")
 
   # @param [Hash] options
   # @param [Hash] options [String] source_url Points to a hosted source of transit data in GTFS format (e.g. 'http://my-site.com/gtfs/some_feed.zip').
