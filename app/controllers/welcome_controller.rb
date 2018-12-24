@@ -1,7 +1,7 @@
 class WelcomeController < ApplicationController
 
   def index
-    @message = "Hello World"
+    @active_schedule = Schedule.active_one
   end
 
 end

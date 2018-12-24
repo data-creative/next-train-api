@@ -25,10 +25,11 @@ heroku addons:create scheduler:standard -a next-train-staging
 
 In the console, create a new environment variable called `DATABASE_URL`, and set its value to the same thing as `CLEARDB_DATABASE_URL`, except use `mysql2:` instead of `mysql:`.
 
-For staging only, set `MAILER_HOST_URL` environment variable to prevent registration mailer links from pointing to production:
+Set `MAILER_HOST` environment variable to specify which server emails are coming from:
 
 ```` sh
-heroku config:set MAILER_HOST_URL="next-train-staging.herokuapp.com" -a next-train-staging
+heroku config:set MAILER_HOST="next-train-production.herokuapp.com" -a next-train-production
+heroku config:set MAILER_HOST="next-train-staging.herokuapp.com" -a next-train-staging
 ````
 
 #### Production

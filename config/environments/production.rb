@@ -89,7 +89,7 @@ Rails.application.configure do
   #
 
   config.action_mailer.default_url_options = {
-    host: ENV.fetch('MAILER_HOST_URL', 'next-train-production.herokuapp.com') # set MAILER_HOST_URL on staging to point to staging instead of production
+    host: ENV['MAILER_HOST']
   }
 
   # Send mail through sendgrid smtp on production.

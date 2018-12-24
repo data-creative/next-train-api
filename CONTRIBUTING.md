@@ -33,7 +33,7 @@ Install gem dependencies.
 bundle install --without production
 ````
 
-### Database
+### Database Setup
 
 Create database user:
 
@@ -58,7 +58,9 @@ bundle exec rake db:seed
 bundle exec rake gtfs:import
 ````
 
-### Webserver
+<hr>
+
+### Web Server
 
 Start development web server:
 
@@ -68,7 +70,15 @@ rails s
 
 Then view in browser at [localhost:3000](localhost:3000).
 
-### Console
+### Mail Server
+
+Start a local mail server:
+
+```sh
+mailcatcher
+```
+
+### Local Development Console
 
 Start development console:
 

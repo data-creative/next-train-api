@@ -71,6 +71,7 @@
 ## Ruby
 
   + [DateTime](http://ruby-doc.org/stdlib-2.4.1/libdoc/date/rdoc/DateTime.html#method-c-strptime)
+  + https://stackoverflow.com/a/38733065/670433
 
 ## Travis
 
