@@ -9,7 +9,7 @@ before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS next_train_test;'
 env:
   global:
-    - DATABASE_USERNAME="travis"
+    - DATABASE_USER="travis"
     - DATABASE_PASSWORD=""
     - CC_TEST_REPORTER_ID=1ce5201f57b288a53e33ae8768ed7700578dffce593c814deceb0051bc208d24
     - COVERAGE=true
