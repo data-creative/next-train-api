@@ -1,3 +1,11 @@
+# # generate code coverage reports
+# if ENV.fetch("COVERAGE", nil) == 'true'
+#   require "simplecov"
+#   require "simplecov-console"
+#   SimpleCov.formatter = SimpleCov::Formatter::Console
+#   SimpleCov.start
+# end
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV["RAILS_ENV"] ||= 'test'
 require 'spec_helper'
