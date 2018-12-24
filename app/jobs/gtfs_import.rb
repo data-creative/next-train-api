@@ -27,8 +27,8 @@ class GtfsImport < ApplicationJob
   end
 
   def perform
-    start
     begin
+      start
       logger.info { "IMPORTING GTFS FEED FROM #{source_url}" }
       hosted_schedule.destroy if forced?
       if hosted_schedule != active_schedule
@@ -37,13 +37,14 @@ class GtfsImport < ApplicationJob
         transform_and_load
         activate
       end
+      finish
     rescue => e
       logger.error { "#{e.class} -- #{e.message}"}
       errors << {class: e.class.to_s, message: e.message}
       # send error
     end
-    finish
     logger.info { results }
+    results
   end #TODO: destroy existing data only after activating the new schedule only after data finishes loading
 
   def results
@@ -61,19 +62,19 @@ class GtfsImport < ApplicationJob
     forced == true
   end
 
-  private
-
-  def active_schedule
-    Schedule.active_one
-  end
-
   def hosted_schedule
-    @schedule = Schedule.where({
+    Schedule.where({
       :source_url => source_url,
       :published_at => headers["last-modified"].first.to_datetime,
       :content_length => headers["content-length"].first.to_i,
       :etag => headers["etag"].first.tr('"','')
     }).first_or_create!
+  end
+
+  private
+
+  def active_schedule
+    Schedule.active_one
   end
 
   def response
@@ -96,7 +97,7 @@ class GtfsImport < ApplicationJob
 
   def transform_and_load
     Zip::File.open(destination_path) do |zip_file|
-      options = {:zip_file => zip_file, :schedule => @schedule, :logger => logger}
+      options = {:zip_file => zip_file, :schedule => hosted_schedule, :logger => logger}
       AgencyFileParser.new(options).perform
       CalendarsFileParser.new(options).perform
       CalendarDatesFileParser.new(options).perform
@@ -109,7 +110,7 @@ class GtfsImport < ApplicationJob
 
   def activate
     logger.info{ "ACTIVATING SCHEDULE" }
-    @schedule.activate!
+    hosted_schedule.activate!
   end
 
 end
