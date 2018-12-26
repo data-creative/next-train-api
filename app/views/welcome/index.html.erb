@@ -7,8 +7,7 @@
     <p><pre><%= JSON.pretty_generate(@active_schedule.serializable_hash) %></pre></p>
   <% else %>
     <p>
-      Oh, it seems this app hasn't yet imported a schedule.
-      Please <a href="BTN-TODO">fetch the latest one</a> now.
+      Oh, schedule data not found. Please <a href="BTN-TODO">fetch the latest schedule</a> now.
     </p>
   <% end %>
 
