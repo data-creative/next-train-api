@@ -58,11 +58,12 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     end
 
     describe "mailer" do
+      let(:started_at) { "2018-12-26 16:00:00 -0500" }
       let(:results) { {
         :source_url=>"http://www.my-site.com/gtfs-feed.zip",
         :destination_path=>"./tmp/google_transit.zip",
         :forced=>false,
-        :started_at=>"2018-12-26 16:32:49 -0500",
+        :started_at=>started_at,
         :ended_at=>"",
         :errors=>[ {:class=>"RuntimeError", :message=>"OOPS SOME VALIDATION ERROR OR SOMETHING"} ]
       } }
@@ -72,7 +73,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       let(:message) { instance_double(ActionMailer::MessageDelivery) }
 
       before(:each) do
-        Timecop.freeze( "2018-12-26 16:32:49 -0500" )
+        Timecop.freeze( started_at )
         #allow(GtfsImportMailer).to receive(:schedule_activation_error).with(mail_options).and_return(message) # not sure why the test is passing without this line...
       end
 
