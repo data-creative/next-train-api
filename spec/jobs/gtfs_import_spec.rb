@@ -22,6 +22,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
   context "when unsuccessful due to errors ocurring after metadata extraction" do
     let!(:pre_import_active_schedule){ create(:active_schedule) }
 
+    #let(:error) { StandardError.new("OOPS OH NO")}
     before(:each) do
       stub_download_zip(source_url)
       allow(import).to receive(:transform_and_load).and_raise("OOPS SOME VALIDATION ERROR OR SOMETHING")
@@ -63,9 +64,9 @@ RSpec.describe GtfsImport, "#perform", type: :job do
         :forced=>false,
         :started_at=>"2018-12-26 16:32:49 -0500",
         :ended_at=>"",
-        :errors=>[ {:class=>"RuntimeError", :message=>"OOOPS OH NO"} ]
+        :errors=>[ {:class=>"RuntimeError", :message=>"OOPS SOME VALIDATION ERROR OR SOMETHING"} ]
       } }
-      let(:mail_options){ { error_class: "RuntimeError", error_message: "OOOPS OH NO", results: results } }
+      let(:mail_options){ { error_class: "RuntimeError", error_message: "OOPS SOME VALIDATION ERROR OR SOMETHING", results: results } }
 
       let(:mailer) { class_double(GtfsImportMailer) }
       let(:message) { instance_double(ActionMailer::MessageDelivery) }
@@ -90,21 +91,22 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     let(:imported_consolidated_stop_times){ StopTime.where(:trip_guid => "1640", :stop_guid => "NHV")} # there were originally two different stop times, the first with arrival and departure at 17:44:00, and the second with arrival and departure at 17:48:00
 
     before(:each) do
-      puts "OUTSIDE BEFORE"
       stub_download_zip(source_url)
-      import.perform
     end
 
     it "should posess a started_at and an ended_at " do
+      import.perform
       expect(import.started_at).to_not be_blank
       expect(import.ended_at).to_not be_blank
     end
 
     it "should persist transit schedule metadata" do
+      import.perform
       expect(imported_schedule).to_not be_blank
     end
 
     it "should persist transit schedule data" do
+      import.perform
       expect(Agency.count).to eql(1)
       expect(Calendar.count).to eql(6)
       expect(CalendarDate.count).to eql(8)
@@ -115,29 +117,32 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     end
 
     it "should persist stop latitude and longitude to 8 decimal places" do
+      import.perform
       expect(imported_stop.latitude.to_f).to eql(41.29771887)
       expect(imported_stop.longitude.to_f).to eql(-72.92673111)
     end
 
     it "should consolidate duplicative sequential stop times, using the earliest arrival and latest departure" do
+      import.perform
       expect(imported_consolidated_stop_times.count).to eql(1)
       expect(imported_consolidated_stop_times.first.arrival_time).to eql("17:44:00")
       expect(imported_consolidated_stop_times.first.departure_time).to eql("17:48:00")
     end
 
     it "should mark the imported schedule as active" do
+      import.perform
       expect(imported_schedule.active?).to eql(true)
     end
 
     describe "mailer" do
       let(:started_at) { "2018-12-26 16:00:00 -0500" }
-      let(:ended_at)   { "2018-12-26 16:03:00 -0500" }
+      #let(:ended_at)   { "2018-12-26 16:03:00 -0500" }
       let(:results) { {
         :source_url=>"http://www.my-site.com/gtfs-feed.zip",
         :destination_path=>"./tmp/google_transit.zip",
         :forced=>false,
         :started_at=> started_at,
-        :ended_at=> ended_at,
+        :ended_at=> "", # still blank because the job hasn't "finished" yet. consider modifying this construction.
         :errors=>[]
       } }
       let(:mail_options){ { results: results } }
@@ -146,15 +151,13 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       let(:message) { instance_double(ActionMailer::MessageDelivery) }
 
       before(:each) do
-        puts "INSIDE BEFORE"
-        import.started_at = started_at.to_datetime
-        Timecop.freeze( ended_at )
+        Timecop.freeze( started_at )
         allow(GtfsImportMailer).to receive(:schedule_activation_success).with(mail_options).and_return(message) # not sure why the test is passing without this line...
       end
 
       after { Timecop.return }
 
-      it "should notify admins" do
+      it "should send a success message" do
         expect(GtfsImportMailer).to receive(:schedule_activation_success).with(mail_options).and_return(message)
         expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
         import.perform

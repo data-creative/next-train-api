@@ -16,11 +16,14 @@ class ApplicationJob < ActiveJob::Base
 
   def start
     @started_at = Time.zone.now
+    logger.info{ "JOB STARTING AT #{started_at.to_s}" }
+    @started_at
   end
 
   def finish
     @ended_at = Time.zone.now
-    logger.info{ "SUCCESSFUL AFTER #{duration_seconds} SECONDS" }
+    logger.info{ "JOB SUCCESSFUL AFTER #{duration_seconds} SECONDS" }
+    @ended_at
   end
 
   def duration_seconds
