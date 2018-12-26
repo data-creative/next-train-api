@@ -30,7 +30,6 @@ class GtfsImport < ApplicationJob
     begin
       start
       logger.info { "IMPORTING GTFS FEED FROM #{source_url}" }
-      raise "OOOPS OH NO"
       hosted_schedule.destroy if forced?
       if hosted_schedule != active_schedule
         delete_destination

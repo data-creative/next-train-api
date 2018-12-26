@@ -1,11 +1,12 @@
 class GtfsImportMailer < ApplicationMailer
 
-  ADMIN_EMAIL = "someone@example.com"
+  ADMIN_EMAIL = ENV.fetch("ADMIN_EMAIL", "someone@example.com") # todo: ENV["ADMIN_EMAIL"]
 
   def schedule_activation_error(params={})
-    @results = params[:results]
     @error_class = params[:error_class]
     @error_message = params[:error_message]
+    @results = params[:results]
+
     mail(to: ADMIN_EMAIL, subject: "Schedule Activation Error")
   end
 
