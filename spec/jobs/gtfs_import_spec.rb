@@ -72,7 +72,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
       before(:each) do
         Timecop.freeze( "2018-12-26 16:32:49 -0500" )
-        #allow(GtfsImport).to receive(:schedule_activation_error).with(mail_options).and_return(message) # not sure why the test is passing without this line...
+        #allow(GtfsImportMailer).to receive(:schedule_activation_error).with(mail_options).and_return(message) # not sure why the test is passing without this line...
       end
 
       after { Timecop.return }
@@ -90,6 +90,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     let(:imported_consolidated_stop_times){ StopTime.where(:trip_guid => "1640", :stop_guid => "NHV")} # there were originally two different stop times, the first with arrival and departure at 17:44:00, and the second with arrival and departure at 17:48:00
 
     before(:each) do
+      puts "OUTSIDE BEFORE"
       stub_download_zip(source_url)
       import.perform
     end
@@ -126,6 +127,38 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
     it "should mark the imported schedule as active" do
       expect(imported_schedule.active?).to eql(true)
+    end
+
+    describe "mailer" do
+      let(:started_at) { "2018-12-26 16:00:00 -0500" }
+      let(:ended_at)   { "2018-12-26 16:03:00 -0500" }
+      let(:results) { {
+        :source_url=>"http://www.my-site.com/gtfs-feed.zip",
+        :destination_path=>"./tmp/google_transit.zip",
+        :forced=>false,
+        :started_at=> started_at,
+        :ended_at=> ended_at,
+        :errors=>[]
+      } }
+      let(:mail_options){ { results: results } }
+
+      let(:mailer) { class_double(GtfsImportMailer) }
+      let(:message) { instance_double(ActionMailer::MessageDelivery) }
+
+      before(:each) do
+        puts "INSIDE BEFORE"
+        import.started_at = started_at.to_datetime
+        Timecop.freeze( ended_at )
+        allow(GtfsImportMailer).to receive(:schedule_activation_success).with(mail_options).and_return(message) # not sure why the test is passing without this line...
+      end
+
+      after { Timecop.return }
+
+      it "should notify admins" do
+        expect(GtfsImportMailer).to receive(:schedule_activation_success).with(mail_options).and_return(message)
+        expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
+        import.perform
+      end
     end
   end
 

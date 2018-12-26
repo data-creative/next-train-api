@@ -36,7 +36,7 @@ class GtfsImport < ApplicationJob
         extract
         transform_and_load
         activate
-        #GtfsImportMailer.schedule_activation_success(results: results).deliver_later
+        GtfsImportMailer.schedule_activation_success(results: results).deliver_later
       end
       finish
     rescue => e

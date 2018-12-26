@@ -1,5 +1,5 @@
 class ApplicationJob < ActiveJob::Base
-  attr_reader :started_at, :ended_at, :logger, :errors
+  attr_accessor :started_at, :ended_at, :logger, :errors
 
   def initialize(options)
     @logger = options[:logger] || default_logger
