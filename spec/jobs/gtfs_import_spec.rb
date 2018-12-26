@@ -55,6 +55,34 @@ RSpec.describe GtfsImport, "#perform", type: :job do
         expect(imported_schedule.active?).to eql(false)
       end
     end
+
+    describe "mailer" do
+      let(:results) { {
+        :source_url=>"http://www.my-site.com/gtfs-feed.zip",
+        :destination_path=>"./tmp/google_transit.zip",
+        :forced=>false,
+        :started_at=>"2018-12-26 16:32:49 -0500",
+        :ended_at=>"",
+        :errors=>[ {:class=>"RuntimeError", :message=>"OOOPS OH NO"} ]
+      } }
+      let(:mail_options){ { error_class: "RuntimeError", error_message: "OOOPS OH NO", results: results } }
+
+      let(:mailer) { class_double(GtfsImportMailer) }
+      let(:message) { instance_double(ActionMailer::MessageDelivery) }
+
+      before(:each) do
+        Timecop.freeze( "2018-12-26 16:32:49 -0500" )
+        #allow(GtfsImport).to receive(:schedule_activation_error).with(mail_options).and_return(message) # not sure why the test is passing without this line...
+      end
+
+      after { Timecop.return }
+
+      it "should notify admins" do
+        expect(GtfsImportMailer).to receive(:schedule_activation_error).with(mail_options).and_return(message)
+        expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
+        import.perform
+      end
+    end
   end
 
   context "when successful" do

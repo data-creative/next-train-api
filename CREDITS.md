@@ -50,6 +50,10 @@
   + http://stackoverflow.com/questions/24642005/rails-association-with-multiple-foreign-keys
   + http://stackoverflow.com/questions/6686920/activerecord-query-union
 
+## ActionMailer
+
+  + https://www.rubydoc.info/gems/actionmailer/5.0.0.1
+
 ## Shore Line East GTFS
 
   + https://twitter.com/s2t2/status/816031995209850880

@@ -36,6 +36,7 @@ group :development do
 end
 
 group :test do
+  gem "timecop"
   gem "simplecov", "~> 0.16"
   gem "simplecov-console", "~> 0.4"
 end

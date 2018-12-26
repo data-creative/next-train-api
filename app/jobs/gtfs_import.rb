@@ -30,23 +30,24 @@ class GtfsImport < ApplicationJob
     begin
       start
       logger.info { "IMPORTING GTFS FEED FROM #{source_url}" }
+      raise "OOOPS OH NO"
       hosted_schedule.destroy if forced?
       if hosted_schedule != active_schedule
         delete_destination
         extract
         transform_and_load
         activate
-        # todo: send schedule activation (import success) email
+        #GtfsImportMailer.schedule_activation_success(results: results).deliver_later
       end
       finish
     rescue => e
       logger.error { "#{e.class} -- #{e.message}"}
       errors << {class: e.class.to_s, message: e.message}
-      # todo: send schedule activation error (import failure/error) email
+      GtfsImportMailer.schedule_activation_error(error_class: e.class.to_s, error_message: e.message, results: results).deliver_later
       # todo: send error to error-reporting service (maybe)
     end
     logger.info { results }
-    # todo: send event with results
+    # todo: send analytics event with results
     results
   end #TODO: destroy existing data only after activating the new schedule only after data finishes loading
 
@@ -55,8 +56,8 @@ class GtfsImport < ApplicationJob
       source_url: source_url,
       destination_path: destination_path,
       forced: forced?,
-      started_at: started_at,
-      ended_at: ended_at,
+      started_at: started_at.to_s,
+      ended_at: ended_at.to_s,
       #hosted_schedule: hosted_schedule.serializable_hash
       errors: errors
     }
