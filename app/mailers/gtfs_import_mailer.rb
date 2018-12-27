@@ -4,10 +4,11 @@ class GtfsImportMailer < ApplicationMailer
 
   def schedule_report(params={})
     @results = params[:results]
-    @active_schedule = @results.try(:active_schedule)
-    @hosted_schedule = @results.try(:hosted_schedule)
-    @new_schedule_activation = @results.try(:new_schedule_activation) == true
-    @errors = @results.try(:errors)
+    @active_schedule = @results.try(:[], :active_schedule)
+    @hosted_schedule = @results.try(:[], :hosted_schedule)
+    #@new_schedule = @results.try(:[], :new_schedule) == true
+    @new_schedule_activation = @results.try(:[], :new_schedule_activation) == true
+    @errors = @results.try(:[], :errors)
 
     @subject = if @errors
       "GTFS Schedule Error(s)"

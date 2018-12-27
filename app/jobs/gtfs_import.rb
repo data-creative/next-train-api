@@ -29,8 +29,9 @@ class GtfsImport < ApplicationJob
   end
 
   def perform
+    clock_in
+
     begin
-      clock_in
       logger.info { "INSPECTING SCHEDULE HOSTED AT: #{source_url.upcase}" }
 
       if destructive?
@@ -42,6 +43,7 @@ class GtfsImport < ApplicationJob
       results[:active_schedule] = active_schedule.serializable_hash
 
       if new_hosted_schedule?
+        results[:new_schedule] = true
         logger.info { "FOUND NEW SCHEDULE: #{hosted_schedule.serializable_hash} \nPROCESSING..." }
         delete_destination
         extract
@@ -50,12 +52,11 @@ class GtfsImport < ApplicationJob
         results[:new_schedule_activation] = true
         logger.info{ "ACTIVATED NEW SCHEDULE!" }
       end
-
-      clock_out
     rescue => e
       handle_error(e)
     end
 
+    clock_out
     logger.info { "SENDING SCHEDULE REPORT: #{results}" }
     schedule_report_email.deliver_now # later
     results
