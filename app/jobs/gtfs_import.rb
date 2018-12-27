@@ -35,12 +35,12 @@ class GtfsImport < ApplicationJob
       logger.info { "INSPECTING SCHEDULE HOSTED AT: #{source_url.upcase}" }
 
       if destructive?
-        logger.info { "DESTROYING SCHEDULE: #{hosted_schedule.serializable_hash}" }
+        logger.info { "DESTROYING SCHEDULE: #{hosted_schedule.try(:serializable_hash)}" }
         hosted_schedule.try(:destroy)
       end
 
-      results[:hosted_schedule] = hosted_schedule.serializable_hash
-      results[:active_schedule] = active_schedule.serializable_hash
+      results[:hosted_schedule] = hosted_schedule.try(:serializable_hash)
+      results[:active_schedule] = active_schedule.try(:serializable_hash)
 
       if new_hosted_schedule?
         results[:new_schedule] = true
@@ -60,6 +60,8 @@ class GtfsImport < ApplicationJob
     end
 
     clock_out
+
+    #binding.pry
     logger.info { "SENDING SCHEDULE REPORT: #{results}" }
     schedule_report_email.deliver_now # later
     results

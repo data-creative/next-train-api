@@ -6,6 +6,6 @@ namespace :gtfs do
 
   desc "Import hosted schedule regardless of necessity."
   task force_import: :environment do
-    GtfsImport.new(:destructive_mode => true).perform
+    GtfsImport.new(destructive: true).perform
   end
 end
