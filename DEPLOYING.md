@@ -10,6 +10,22 @@ heroku login
 
 ## Setting Up Servers from Scratch
 
+In the console, create a new environment variable called `DATABASE_URL`, and set its value to the same thing as `CLEARDB_DATABASE_URL`, except use `mysql2:` instead of `mysql:`.
+
+Set `MAILER_HOST` environment variable to specify which server emails are coming from:
+
+```` sh
+heroku config:set MAILER_HOST="next-train-production.herokuapp.com" -a next-train-production
+heroku config:set MAILER_HOST="next-train-staging.herokuapp.com" -a next-train-staging
+````
+
+Set `ADMIN_EMAIL` environment variable to specify which email address to send notifications:
+
+```` sh
+heroku config:set ADMIN_EMAIL="someone@gmail.com" -a next-train-production
+heroku config:set ADMIN_EMAIL="someone@gmail.com" -a next-train-staging
+````
+
 ### Staging
 
 ```` sh
@@ -21,15 +37,6 @@ heroku config:set GTFS_SOURCE_URL="http://www.shorelineeast.com/google_transit.z
 heroku addons:create cleardb:ignite -a next-train-staging
 heroku addons:create sendgrid:starter -a next-train-staging
 heroku addons:create scheduler:standard -a next-train-staging
-````
-
-In the console, create a new environment variable called `DATABASE_URL`, and set its value to the same thing as `CLEARDB_DATABASE_URL`, except use `mysql2:` instead of `mysql:`.
-
-Set `MAILER_HOST` environment variable to specify which server emails are coming from:
-
-```` sh
-heroku config:set MAILER_HOST="next-train-production.herokuapp.com" -a next-train-production
-heroku config:set MAILER_HOST="next-train-staging.herokuapp.com" -a next-train-staging
 ````
 
 #### Production
