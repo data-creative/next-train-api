@@ -4,7 +4,7 @@ class GtfsImportMailer < ApplicationMailer
 
   def schedule_report(params={})
     @results = params[:results]
-    raise "Expecting results" unless @results && @results.is_a?(Hash)
+    validate_results
     @source_url = @results[:source_url]
     @hosted_schedule = @results[:hosted_schedule]
     @schedule_activation = @results[:schedule_activation] == true
@@ -22,6 +22,12 @@ class GtfsImportMailer < ApplicationMailer
     end
 
     mail(to: ADMIN_EMAIL, subject: @subject)
+  end
+
+  private
+
+  def validate_results
+    raise "Expecting results" unless @results && @results.is_a?(Hash)
   end
 
 end
