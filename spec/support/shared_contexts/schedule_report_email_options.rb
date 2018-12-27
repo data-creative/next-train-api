@@ -34,7 +34,7 @@ RSpec.shared_context "schedule report email options" do
 
   let(:error_results) {
     blank_results.merge(
-      end_at: ""
+      end_at: "",
       errors: [ { class: "MyError", message: "Oh, something went wrong" } ]
     )
   }
