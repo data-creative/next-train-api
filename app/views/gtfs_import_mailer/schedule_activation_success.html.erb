@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
-  </head>
-  <body>
 
-    <h1>Hello</h1>
+    <h1><%= @subject %></h1>
 
-    <p>
-      Success!
-    </p>
+    <div id="new-schedule">
+      <p>New schedule:</p>
 
-
-  </body>
-</html>
+      <p><pre><%= @results[:hosted_schedule] %></pre></p>
+    </div>

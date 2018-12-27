@@ -6,12 +6,14 @@ class GtfsImportMailer < ApplicationMailer
     @error_class = params[:error_class]
     @error_message = params[:error_message]
     @results = params[:results]
-    mail(to: ADMIN_EMAIL, subject: "Schedule Activation Error")
+    @subject = "Schedule Activation Error"
+    mail(to: ADMIN_EMAIL, subject: @subject)
   end
 
   def schedule_activation_success(params={})
     @results = params[:results]
-    mail(to: ADMIN_EMAIL, subject: "Schedule Activation Success!")
+    @subject = "Schedule Activation Success!"
+    mail(to: ADMIN_EMAIL, subject: @subject)
   end
 
 end

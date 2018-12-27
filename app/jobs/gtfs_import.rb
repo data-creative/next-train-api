@@ -57,7 +57,7 @@ class GtfsImport < ApplicationJob
       forced: forced?,
       started_at: started_at.to_s,
       ended_at: ended_at.to_s,
-      #hosted_schedule: hosted_schedule.serializable_hash
+      hosted_schedule: hosted_schedule.try(:serializable_hash),
       errors: errors
     }
   end

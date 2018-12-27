@@ -34,7 +34,6 @@ RSpec.describe GtfsImportMailer, type: :mailer do
       let(:delivery_job) { {:job=>ActionMailer::DeliveryJob, :args=>[described_class.to_s, "schedule_activation_success", "deliver_now"], :queue=>"mailers"} }
 
       it "enqueues a job for later" do
-        #expect { delivery }.to have_enqueued_job(ActionMailer::DeliveryJob) #.with(delivery_job)
         expect { delivery }.to change { ActionMailer::DeliveryJob.queue_adapter.enqueued_jobs.count }.by(1)
         delivery
         expect(ActionMailer::DeliveryJob.queue_adapter.enqueued_jobs.first).to eql(delivery_job)

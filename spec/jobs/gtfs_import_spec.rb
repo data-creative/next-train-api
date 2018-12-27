@@ -20,7 +20,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
   let(:imported_schedule){ Schedule.where(:source_url => source_url, :published_at => last_modified_at, :etag => etag, :content_length => content_length).first }
 
   context "when unsuccessful due to errors ocurring after metadata extraction" do
-    let!(:pre_import_active_schedule){ create(:active_schedule) }
+    let!(:pre_import_active_schedule){ create(:schedule, :active) }
 
     #let(:error) { StandardError.new("OOPS OH NO")}
     before(:each) do
@@ -138,12 +138,14 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     describe "mailer" do
       let(:started_at) { "2018-12-26 16:00:00 -0500" }
       #let(:ended_at)   { "2018-12-26 16:03:00 -0500" }
+
       let(:results) { {
         :source_url=>"http://www.my-site.com/gtfs-feed.zip",
         :destination_path=>"./tmp/google_transit.zip",
         :forced=>false,
         :started_at=> started_at,
         :ended_at=> "", # still blank because the job hasn't "finished" yet. consider modifying this construction.
+        :hosted_schedule=> import.hosted_schedule.serializable_hash, #import.send(:activate), # import.hosted_schedule.serializable_hash.merge(active: true), # imported_schedule,
         :errors=>[]
       } }
       let(:mail_options){ { results: results } }
@@ -167,7 +169,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
   end
 
   context "when forced" do
-    let!(:pre_import_hosted_active_schedule){ create(:active_schedule, {
+    let!(:pre_import_hosted_active_schedule){ create(:schedule, :active, {
       :published_at => headers["last-modified"].first.to_datetime,
       :content_length => headers["content-length"].first.to_i,
       :etag => headers["etag"].first.tr('"','')
