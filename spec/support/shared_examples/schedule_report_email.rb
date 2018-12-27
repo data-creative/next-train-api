@@ -21,19 +21,29 @@ RSpec.shared_examples "a schedule report email" do
     end
   end
 
-  #describe "#deliver_later" do
-  #  let(:delivery){ described_class.schedule_report(message_options).deliver_later }
-#
-  #  let(:delivery_job) { {
-  #    :job=>ActionMailer::DeliveryJob,
-  #    :args=>[described_class.to_s, "schedule_report", "deliver_now", message_options],
-  #    :queue=>"mailers"} }
-#
-  #  it "enqueues a job for later" do
-  #    expect { delivery }.to change { ActionMailer::DeliveryJob.queue_adapter.enqueued_jobs.count }.by(1)
-  #    delivery
-  #    expect(ActionMailer::DeliveryJob.queue_adapter.enqueued_jobs.first).to eql(delivery_job)
-  #  end
-  #end
+  describe "#deliver_later" do
+    let(:delivery){ described_class.schedule_report(message_options).deliver_later }
+
+    let(:delivery_job) { {
+      :job=>ActionMailer::DeliveryJob,
+      :args=>[described_class.to_s, "schedule_report", "deliver_now", message_options],
+      :queue=>"mailers"
+    } }
+
+    it "enqueues a job for later" do
+      expect { delivery }.to change { ActionMailer::DeliveryJob.queue_adapter.enqueued_jobs.count }.by(1)
+    end
+
+    it "enqueues the right job" do
+      delivery
+      enqueued_job = ActionMailer::DeliveryJob.queue_adapter.enqueued_jobs.first.deep_symbolize_keys
+      expect(enqueued_job[:job]).to eql(ActionMailer::DeliveryJob)
+      expect(enqueued_job[:queue]).to eql("mailers")
+      expect(enqueued_job[:args][0]).to eql(described_class.to_s)
+      expect(enqueued_job[:args][1]).to eql("schedule_report")
+      expect(enqueued_job[:args][2]).to eql("deliver_now")
+      expect(enqueued_job[:args][3][:results].keys - [:_aj_symbol_keys]).to match_array(results_keys)
+    end
+  end
 
 end
