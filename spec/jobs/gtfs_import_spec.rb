@@ -1,16 +1,16 @@
 require 'rails_helper'
 require_relative '../support/gtfs_import_helpers'
 
-RSpec.describe GtfsImport, "#forced?", type: :job do
+RSpec.describe GtfsImport, "#destructive_mode?", type: :job do
   let(:source_url){ "http://www.my-site.com/gtfs-feed.zip"}
   let(:import){ GtfsImport.new(:source_url => source_url)}
-  let(:forced_import){ GtfsImport.new(:source_url => source_url, :forced => true)}
-  let(:nonforced_import){ GtfsImport.new(:source_url => source_url, :forced => false)}
+  let(:destructive_mode_import){ GtfsImport.new(:source_url => source_url, :destructive_mode => true)}
+  let(:nondestructive_mode_import){ GtfsImport.new(:source_url => source_url, :destructive_mode => false)}
 
-  it "should properly indicate whether or not the :forced option was invoked" do
-    expect(import.forced?).to eql(false)
-    expect(forced_import.forced?).to eql(true)
-    expect(nonforced_import.forced?).to eql(false)
+  it "should properly indicate whether or not the :destructive_mode option was invoked" do
+    expect(import.destructive_mode?).to eql(false)
+    expect(destructive_mode_import.destructive_mode?).to eql(true)
+    expect(nondestructive_mode_import.destructive_mode?).to eql(false)
   end
 end
 
@@ -62,7 +62,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       let(:results) { {
         :source_url=>"http://www.my-site.com/gtfs-feed.zip",
         :destination_path=>"./tmp/google_transit.zip",
-        :forced=>false,
+        :destructive_mode=>false,
         :started_at=>started_at,
         :ended_at=>"",
         :errors=>[ {:class=>"RuntimeError", :message=>"OOPS SOME VALIDATION ERROR OR SOMETHING"} ]
@@ -142,7 +142,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       let(:results) { {
         :source_url=>"http://www.my-site.com/gtfs-feed.zip",
         :destination_path=>"./tmp/google_transit.zip",
-        :forced=>false,
+        :destructive_mode=>false,
         :started_at=> started_at,
         :ended_at=> "", # still blank because the job hasn't "finished" yet. consider modifying this construction.
         :hosted_schedule=> import.hosted_schedule.serializable_hash, #import.send(:activate), # import.hosted_schedule.serializable_hash.merge(active: true), # imported_schedule,
@@ -168,28 +168,28 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     end
   end
 
-  context "when forced" do
+  context "when destructive_mode" do
     let!(:pre_import_hosted_active_schedule){ create(:schedule, :active, {
       :published_at => headers["last-modified"].first.to_datetime,
       :content_length => headers["content-length"].first.to_i,
       :etag => headers["etag"].first.tr('"','')
     }) }
-    let(:forced_import){ GtfsImport.new(:source_url => source_url, :forced => true)}
+    let(:destructive_mode_import){ GtfsImport.new(:source_url => source_url, :destructive_mode => true)}
 
     before(:each) do
       stub_download_zip(source_url)
     end
 
     it "should posess a started_at and an ended_at " do
-      forced_import.perform
-      expect(forced_import.started_at).to_not be_blank
-      expect(forced_import.ended_at).to_not be_blank
+      destructive_mode_import.perform
+      expect(destructive_mode_import.started_at).to_not be_blank
+      expect(destructive_mode_import.ended_at).to_not be_blank
     end
 
     it "should proceed regardless of whether or not the hosted schedule matches the active schedule" do
-      expect(forced_import).to receive(:transform_and_load)
-      expect(forced_import).to receive(:activate)
-      forced_import.perform
+      expect(destructive_mode_import).to receive(:transform_and_load)
+      expect(destructive_mode_import).to receive(:activate)
+      destructive_mode_import.perform
     end
   end
 end

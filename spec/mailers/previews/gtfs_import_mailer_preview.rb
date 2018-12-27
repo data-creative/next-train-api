@@ -22,7 +22,7 @@ class GtfsImportMailerPreview < ActionMailer::Preview
     {
       :source_url=>"http://www.my-site.com/gtfs-feed.zip",
       :destination_path=>"./tmp/google_transit.zip",
-      :forced=>false,
+      :destructive_mode=>false,
       :started_at=>DateTime.now.to_s,
       :ended_at=>"",
       :hosted_schedule=> {a:1, b:2},

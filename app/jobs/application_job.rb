@@ -1,32 +1,36 @@
 class ApplicationJob < ActiveJob::Base
-  attr_accessor :started_at, :ended_at, :logger, :errors
+  attr_accessor :logger, :start_at, :end_at, :results
 
   def initialize(options)
-    @logger = options[:logger] || default_logger
-    @started_at = nil
-    @ended_at = nil
-    @errors = []
+    @logger = options[:logger] || Rails.logger
+    @results = { errors: [] }
   end
 
   private
 
-  def default_logger
-    Rails.env.development? ? Logger.new(STDOUT) : Rails.logger
+  def clock_in
+    start_at = Time.zone.now
+    results[:start_at] = start_at
+    logger.info{ "JOB STARTING AT #{start_at.to_s}" }
+    start_at
   end
 
-  def start
-    @started_at = Time.zone.now
-    logger.info{ "JOB STARTING AT #{started_at.to_s}" }
-    @started_at
-  end
-
-  def finish
-    @ended_at = Time.zone.now
+  def clock_out
+    end_at = Time.zone.now
+    results[:end_at] = end_at
     logger.info{ "JOB SUCCESSFUL AFTER #{duration_seconds} SECONDS" }
-    @ended_at
+    end_at
   end
 
   def duration_seconds
-    ended_at - started_at if ended_at && started_at
+    end_at - start_at if end_at && start_at
   end
+
+  # @param err [Exception] like StandardError.new("OOPS")
+  def handle_error(err)
+    logger.error { "OOPS: #{err.class} -- #{err.message}" }
+    results[:errors] << {class: err.class.to_s, message: err.message}
+    err
+  end
+
 end
