@@ -22,19 +22,18 @@ RSpec.describe GtfsImport, "#perform", type: :job do
   context "when unsuccessful due to errors ocurring after metadata extraction" do
     let!(:pre_import_active_schedule){ create(:schedule, :active) }
 
-    #let(:error) { StandardError.new("OOPS OH NO")}
     before(:each) do
       stub_download_zip(source_url)
       allow(import).to receive(:transform_and_load).and_raise("OOPS SOME VALIDATION ERROR OR SOMETHING")
     end
 
-    it "should posess a start_at but not an end_at" do
+    it "should posess a start_at and an end_at" do
       begin
         import.perform
       rescue
       ensure
         expect(import.start_at).to_not be_blank
-        expect(import.end_at).to be_blank
+        expect(import.end_at).to_not be_blank
       end
     end
 
@@ -74,13 +73,13 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
       before(:each) do
         Timecop.freeze( start_at )
-        #allow(GtfsImportMailer).to receive(:schedule_activation_error).with(mail_options).and_return(message) # not sure why the test is passing without this line...
+        #allow(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message) # not sure why the test is passing without this line...
       end
 
       after { Timecop.return }
 
       it "should notify admins" do
-        expect(GtfsImportMailer).to receive(:schedule_activation_error).with(mail_options).and_return(message)
+        expect(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message)
         expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
         import.perform
       end
