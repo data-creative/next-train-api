@@ -1,17 +1,17 @@
 
       <h1><%= @subject %></h1>
 
-      <% if @hosted_schedule %>
+      <% if @source_url %>
       <div id="hosted-schedule">
-        <p>Hosted schedule:</p>
-        <p><pre><%= JSON.pretty_generate(@hosted_schedule) %></pre></p>
+        <p>Source URL:</p>
+        <p><pre><%= @source_url %></pre></p>
       </div>
       <% end %>
 
-      <% if @active_schedule %>
-      <div id="active-schedule">
-        <p>Previously active schedule:</p>
-        <p><pre><%= JSON.pretty_generate(@active_schedule) %></pre></p>
+      <% if @hosted_schedule %>
+      <div id="hosted-schedule">
+        <p>Hosted Schedule:</p>
+        <p><pre><%= JSON.pretty_generate(@hosted_schedule) %></pre></p>
       </div>
       <% end %>
 

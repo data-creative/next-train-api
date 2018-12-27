@@ -8,26 +8,15 @@ RSpec.shared_context "schedule report email options" do
   } }
 
   let(:hosted_schedule) { {
-    "id"=>3,
-    "source_url"=>"http://www.shorelineeast.com/google_transit.zip",
-    "published_at"=>"________",
-    "content_length"=>12375,
-    "etag"=>"9876-919fh430wmsl",
-    "active"=>true,
-    "created_at"=>"_____",
-    "updated_at"=>""
+    id: 3,
+    source_url: "http://www.my-site.com/gtfs-feed.zip",
+    published_at: "2017-03-30 13:54:24 -0400",
+    content_length: 6921,
+    etag: "9876-919fh430wmsl",
+    active: true,
+    created_at: "2017-05-21 15:12:42 -0400",
+    updated_at: "2017-05-21 15:13:00 -0400"
   } }
-
-  #let(:active_schedule) { {
-  #  "id"=>2,
-  #  "source_url"=>"http://www.shorelineeast.com/google_transit.zip",
-  #  "published_at"=>"________",
-  #  "content_length"=>12375,
-  #  "etag"=>"1234-56abcdef78khkpw",
-  #  "active"=>false,
-  #  "created_at"=>"_____",
-  #  "updated_at"=>""
-  #} }
 
   let(:activation_results) {
     blank_results.merge(
@@ -45,6 +34,7 @@ RSpec.shared_context "schedule report email options" do
 
   let(:error_results) {
     blank_results.merge(
+      end_at: ""
       errors: [ { class: "MyError", message: "Oh, something went wrong" } ]
     )
   }
