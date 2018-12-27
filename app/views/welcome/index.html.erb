@@ -1,16 +1,19 @@
-<div id="active-schedule">
+<div id="source-url">
+  <h3>GTFS Source URL</h3>
 
+   <p><pre><%= @source_url %></pre></p>
+</div>
+
+<div id="active-schedule">
   <h3>Active Schedule</h3>
 
   <% if @active_schedule %>
-    <p>The latest successfully-imported schedule is:</p>
     <p><pre><%= JSON.pretty_generate(@active_schedule.serializable_hash) %></pre></p>
   <% else %>
     <p>
-      Oh, schedule data not found. Please <a href="BTN-TODO">fetch the latest schedule</a> now.
+      Oh, schedule not found. Please <a href="BTN-TODO">fetch the latest one</a> now.
     </p>
   <% end %>
-
 </div>
 
 <div id="notification-preferences">
