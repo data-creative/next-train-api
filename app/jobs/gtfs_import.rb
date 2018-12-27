@@ -49,8 +49,11 @@ class GtfsImport < ApplicationJob
         extract
         transform_and_load
         hosted_schedule.activate!
-        results[:new_schedule_activation] = true
+        results[:schedule_activation] = true
         logger.info{ "ACTIVATED NEW SCHEDULE!" }
+      else
+        results[:schedule_verification] = true
+        logger.info{ "VERIFIED EXISTING SCHEDULE" }
       end
     rescue => e
       handle_error(e)

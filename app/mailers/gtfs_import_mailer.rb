@@ -4,20 +4,21 @@ class GtfsImportMailer < ApplicationMailer
 
   def schedule_report(params={})
     @results = params[:results]
-    @active_schedule = @results.try(:[], :active_schedule)
-    @hosted_schedule = @results.try(:[], :hosted_schedule)
-    #@new_schedule = @results.try(:[], :new_schedule) == true
-    @new_schedule_activation = @results.try(:[], :new_schedule_activation) == true
+    raise "Expecting results" unless @results && @results.is_a?(Hash)
+    #@active_schedule = @results[:active_schedule]
+    @hosted_schedule = @results[:hosted_schedule]
+    @schedule_activation = @results[:schedule_activation] == true
+    @schedule_verification = @results[:schedule_verification] == true
     @errors = @results.try(:[], :errors)
 
     @subject = if @errors
-      "GTFS Schedule Error(s)"
-    elsif @new_schedule_activation == true
+      "GTFS Schedule Processing Failure"
+    elsif @schedule_activation == true
       "GTFS Schedule Activation!"
-    elsif @results
+    elsif @schedule_verification == true
       "GTFS Schedule Verification"
     else
-      "GTFS Importer Email"
+      raise "GTFS IMPORT EMAIL SUBJECT COMPILATION FAILURE"
     end
 
     mail(to: ADMIN_EMAIL, subject: @subject)

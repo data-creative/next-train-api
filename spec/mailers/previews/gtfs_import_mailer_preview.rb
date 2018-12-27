@@ -1,11 +1,9 @@
 # Preview all emails at http://localhost:3000/rails/mailers/gtfs_import_mailer
 class GtfsImportMailerPreview < ActionMailer::Preview
 
-  include_context "schedule report email"
-
   # ...?errors=true
   # ...?activation=true
-  def schedule_report
+  def schedule_report(params={})
     #message_options = if params[:errors]
     #  { results: error_results }
     #elsif params[:activation]

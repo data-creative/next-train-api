@@ -1,22 +1,26 @@
 
       <h1><%= @subject %></h1>
 
+      <% if @hosted_schedule %>
       <div id="hosted-schedule">
         <p>Hosted schedule:</p>
-        <p><pre><%= @hosted_schedule %></pre></p>
+        <p><pre><%= JSON.pretty_generate(@hosted_schedule) %></pre></p>
       </div>
+      <% end %>
 
+      <% if @active_schedule %>
       <div id="active-schedule">
         <p>Previously active schedule:</p>
-        <p><pre><%= @active_schedule %></pre></p>
+        <p><pre><%= JSON.pretty_generate(@active_schedule) %></pre></p>
       </div>
+      <% end %>
 
-      <% if @errors %>%
+      <% if @errors %>
       <div id="errors">
-        <p>Error(s):</p>
+        <p>Errors:</p>
         <ul>
         <% @errors.each do |err| %>
-          <li><pre><%= err %></pre></li>
+          <li><pre><%= JSON.pretty_generate(err) %></pre></li>
         <% end %>
         </ul>
       </div>
