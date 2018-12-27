@@ -1,22 +1,23 @@
-<h1><%= @subject %></h1>
 
-<div id="hosted-schedule">
-  <p>Hosted schedule:</p>
-  <p><pre><%= @hosted_schedule %></pre></p>
-</div>
+      <h1><%= @subject %></h1>
 
-<div id="active-schedule">
-  <p>Previously active schedule:</p>
-  <p><pre><%= @active_schedule %></pre></p>
-</div>
+      <div id="hosted-schedule">
+        <p>Hosted schedule:</p>
+        <p><pre><%= @hosted_schedule %></pre></p>
+      </div>
 
-<% if @errors %>%
-<div id="errors">
-  <p>Error(s):</p>
-  <ul>
-  <% @errors.each do |err| %>
-    <li><pre><%= err %></pre></li>
-  <% end %>
-  </ul>
-</div>
-<% end %>
+      <div id="active-schedule">
+        <p>Previously active schedule:</p>
+        <p><pre><%= @active_schedule %></pre></p>
+      </div>
+
+      <% if @errors %>%
+      <div id="errors">
+        <p>Error(s):</p>
+        <ul>
+        <% @errors.each do |err| %>
+          <li><pre><%= err %></pre></li>
+        <% end %>
+        </ul>
+      </div>
+      <% end %>

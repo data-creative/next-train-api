@@ -4,17 +4,14 @@ class GtfsImportMailerPreview < ActionMailer::Preview
   # ...?errors=true
   # ...?activation=true
   def schedule_report
-    if params[:errors] == true
-      puts "ERRORS!"
-    end
-
-    message_options = if params[:errors]
-      { results: error_results }
-    elsif params[:activation]
-      { results: activation_results }
-    else
-      { results: verification_results }
-    end
+    #message_options = if params[:errors]
+    #  { results: error_results }
+    #elsif params[:activation]
+    #  { results: activation_results }
+    #else
+    #  { results: verification_results }
+    #end
+    message_options = { results: verification_results }
 
     GtfsImportMailer.schedule_report(message_options).deliver_now
   end

@@ -7,8 +7,10 @@ RSpec.describe GtfsImportMailer, type: :mailer do
   describe ".schedule_report" do
 
     describe "#deliver_now" do
-      let(:message) { described_class.schedule_report.deliver_now }
-      let(:subject) { "GTFS Importer Email" }
+      include_context "schedule report email"
+      let(:message_options) { { results: activation_results } }
+      let(:message) { described_class.schedule_report(message_options).deliver_now }
+      let(:subject) { "GTFS Schedule Verification" }
       let(:expected_text){ [
         subject, "Hosted schedule:", "Previously active schedule:"
       ] }
