@@ -58,36 +58,19 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
     describe "mailer" do
       let(:start_at) { "2018-12-26 16:00:00 -0500" }
+      let(:end_at) { "2018-12-26 16:00:00 -0500" } # because time is frozen
       #let(:end_at) { "2018-12-26 16:03:00 -0500" }
-
-      #let(:results) { {
-      #  :source_url=>"http://www.my-site.com/gtfs-feed.zip",
-      #  :destructive=>false,
-      #  :start_at=>start_at,
-      #  :end_at=>"",
-      #  #:hosted_schedule=>{}
-      #  :errors=>[ {:class=>"RuntimeError", :message=>"OOPS SOME VALIDATION ERROR OR SOMETHING"} ]
-      #} }
-      #let(:mail_options){ { results: results } }
-
       let(:my_error) { {:class=>"RuntimeError", :message=>"OOPS SOME VALIDATION ERROR OR SOMETHING"} }
-      #include_context "schedule report email options"
-      #let(:mail_options){ { results: error_results.merge(
-      #  start_at: start_at,
-      #  errors: [my_error],
-      #  new_schedule: true, # in this example, error occurred after new schedule successfully found
-      #  hosted_schedule: import.hosted_schedule.serializable_hash
-      #) } }
       let(:results) { {
         errors: [my_error],
         source_url: "http://www.my-site.com/gtfs-feed.zip",
         destructive: false,
         start_at: start_at,
-        hosted_schedule: import.hosted_schedule.serializable_hash,
+        hosted_schedule: import.hosted_schedule.serializable_hash, # in this example, error occurred after hosted schedule retrieved
         new_schedule: true, # in this example, error occurred after new schedule successfully found
-        end_at: DateTime.now.to_s
+        end_at: end_at
       } }
-      let(:mail_options) { { results: results } } # Hash[{a:1, c:3, b:2}.sort]
+      let(:mail_options) { { results: results } }
 
       let(:mailer) { class_double(GtfsImportMailer) }
       let(:message) { instance_double(ActionMailer::MessageDelivery) }
@@ -100,11 +83,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       after { Timecop.return }
 
       it "should notify admins" do
-        puts "\n"
-        puts mail_options[:results].keys.to_s
-        #puts mail_options[:results][:hosted_schedule]
-        puts "\n"
-
+        #pp results
         expect(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message)
         expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
         import.perform

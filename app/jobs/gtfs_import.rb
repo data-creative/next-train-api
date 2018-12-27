@@ -59,16 +59,12 @@ class GtfsImport < ApplicationJob
       handle_error(e)
     end
 
+    #pp results
     clock_out
-
-    puts "\n"
-    puts results.keys.to_s
-    puts "\n"
-    #pp results[:hosted_schedule]
-    #binding.pry
     logger.info { "SENDING SCHEDULE REPORT: #{results}" }
     #schedule_report_email.deliver_now # later
-    GtfsImportMailer.schedule_report(results: results).deliver_now # later
+    #GtfsImportMailer.schedule_report(results: results).deliver_now # later
+    GtfsImportMailer.schedule_report(results: results).deliver_later
     results
   end
 
