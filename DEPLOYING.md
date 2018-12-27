@@ -52,8 +52,6 @@ heroku addons:create sendgrid:starter -a next-train-production
 heroku addons:create scheduler:standard -a next-train-production
 ````
 
-In the console, create a new environment variable called `DATABASE_URL`, and set its value to the same thing as `CLEARDB_DATABASE_URL`, except use `mysql2:` instead of `mysql:`.
-
 ## Deploying
 
 Deploy from master branch:
