@@ -18,21 +18,20 @@ RSpec.shared_context "schedule report email options" do
     "updated_at"=>""
   } }
 
-  let(:active_schedule) { {
-    "id"=>2,
-    "source_url"=>"http://www.shorelineeast.com/google_transit.zip",
-    "published_at"=>"________",
-    "content_length"=>12375,
-    "etag"=>"1234-56abcdef78khkpw",
-    "active"=>false,
-    "created_at"=>"_____",
-    "updated_at"=>""
-  } }
+  #let(:active_schedule) { {
+  #  "id"=>2,
+  #  "source_url"=>"http://www.shorelineeast.com/google_transit.zip",
+  #  "published_at"=>"________",
+  #  "content_length"=>12375,
+  #  "etag"=>"1234-56abcdef78khkpw",
+  #  "active"=>false,
+  #  "created_at"=>"_____",
+  #  "updated_at"=>""
+  #} }
 
   let(:activation_results) {
     blank_results.merge(
       hosted_schedule: hosted_schedule,
-      #active_schedule: active_schedule,
       schedule_activation: true
     )
   }

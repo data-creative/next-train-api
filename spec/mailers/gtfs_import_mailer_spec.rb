@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe GtfsImportMailer, type: :mailer do
-  let(:admin_email) { ENV.fetch("ADMIN_EMAIL") }
-  let(:mailer_host) { ENV.fetch("MAILER_HOST") }
 
   describe ".schedule_report" do
     context "activation" do

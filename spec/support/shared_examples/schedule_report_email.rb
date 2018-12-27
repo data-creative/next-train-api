@@ -1,4 +1,6 @@
 RSpec.shared_examples "a schedule report email" do
+  let(:admin_email) { ENV.fetch("ADMIN_EMAIL") }
+  let(:mailer_host) { ENV.fetch("MAILER_HOST") }
 
   let(:message) { described_class.schedule_report(message_options).deliver_now }
 
