@@ -83,7 +83,6 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       after { Timecop.return }
 
       it "should notify admins" do
-        #pp results
         expect(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message)
         expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
         import.perform
@@ -141,25 +140,25 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
     describe "mailer" do
       let(:start_at) { "2018-12-26 16:00:00 -0500" }
-      #let(:end_at)   { "2018-12-26 16:03:00 -0500" }
-
+      let(:end_at) { "2018-12-26 16:00:00 -0500" } # because time is frozen
+      #let(:end_at) { "2018-12-26 16:03:00 -0500" }
       let(:results) { {
-        :source_url=>"http://www.my-site.com/gtfs-feed.zip",
-        :destination_path=>"./tmp/google_transit.zip",
-        :destructive=>false,
-        :start_at=> start_at,
-        :end_at=> "", # still blank because the job hasn't "finished" yet. consider modifying this construction.
-        :hosted_schedule=> import.hosted_schedule.serializable_hash, #import.send(:activate), # import.hosted_schedule.serializable_hash.merge(active: true), # imported_schedule,
-        :errors=>[]
+        errors: [],
+        source_url: "http://www.my-site.com/gtfs-feed.zip",
+        destructive: false,
+        start_at: start_at,
+        hosted_schedule: import.hosted_schedule.serializable_hash,
+        schedule_verification: true,
+        end_at: end_at
       } }
-      let(:mail_options){ { results: results } }
+      let(:mail_options) { { results: results } }
 
       let(:mailer) { class_double(GtfsImportMailer) }
       let(:message) { instance_double(ActionMailer::MessageDelivery) }
 
       before(:each) do
         Timecop.freeze( start_at )
-        allow(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message) # not sure why the test is passing without this line...
+        #allow(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message) # not sure why the test is passing without this line...
       end
 
       after { Timecop.return }
