@@ -24,26 +24,31 @@ class GtfsImport < ApplicationJob
     @destination_path = options[:destination_path] || "./tmp/google_transit.zip"
     @destructive = (options[:destructive] == true)
     super
+    results[:source_url] = @source_url
+    results[:destructive] = @destructive
   end
 
   def perform
     begin
       clock_in
-      logger.info { "IMPORTING SCHEDULE FROM URL SOURCE: #{source_url.upcase}" }
+      logger.info { "INSPECTING SCHEDULE HOSTED AT: #{source_url.upcase}" }
 
       if destructive?
         logger.info { "DESTROYING SCHEDULE: #{hosted_schedule.serializable_hash}" }
         hosted_schedule.try(:destroy)
       end
 
-      results[:hosted_schedule] = hosted_schedule
+      results[:hosted_schedule] = hosted_schedule.serializable_hash
+      results[:active_schedule] = active_schedule.serializable_hash
 
       if new_hosted_schedule?
         logger.info { "FOUND NEW SCHEDULE: #{hosted_schedule.serializable_hash} \nPROCESSING..." }
         delete_destination
         extract
         transform_and_load
-        activate
+        hosted_schedule.activate!
+        results[:new_schedule_activation] = true
+        logger.info{ "ACTIVATED NEW SCHEDULE!" }
       end
 
       clock_out
@@ -51,14 +56,14 @@ class GtfsImport < ApplicationJob
       handle_error(e)
     end
 
-    logger.info { "SENDING RESULTS REPORT: #{results}" }
-    results_report.deliver_now # later
+    logger.info { "SENDING SCHEDULE REPORT: #{results}" }
+    schedule_report_email.deliver_now # later
     results
   end
 
-  #def destructive?
-  #  destructive == true
-  #end
+  def destructive?
+    destructive == true
+  end
 
   def new_hosted_schedule?
     active_schedule && hosted_schedule && active_schedule != hosted_schedule
@@ -77,8 +82,8 @@ class GtfsImport < ApplicationJob
     Schedule.active_one
   end
 
-  def results_report
-    GtfsImportMailer.results_report(results: results)
+  def schedule_report_email
+    GtfsImportMailer.schedule_report(results: results)
   end
 
   private
@@ -112,11 +117,6 @@ class GtfsImport < ApplicationJob
       TripsFileParser.new(options).perform #NOTE: depends on successful completion of RoutesFileParser
       StopTimesFileParser.new(options).perform #NOTE: depends on successful completion of StopsFileParser and TripsFileParser
     end
-  end
-
-  def activate
-    logger.info{ "ACTIVATING SCHEDULE: #{hosted_schedule.serializable_hash}" }
-    hosted_schedule.activate!
   end
 
 end

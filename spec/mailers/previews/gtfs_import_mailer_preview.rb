@@ -1,32 +1,44 @@
 # Preview all emails at http://localhost:3000/rails/mailers/gtfs_import_mailer
 class GtfsImportMailerPreview < ActionMailer::Preview
 
-  def schedule_activation_error
-    my_error = { class: "MyError", message: "OOPS, something unexpected happened." }
-    message_options = {
-      error_class: my_error[:class],
-      error_message: my_error[:message],
-      results: mock_results.merge(:errors=>[my_error])
-    }
-    GtfsImportMailer.schedule_activation_error(message_options).deliver_now
-  end
+  # ...?errors=true
+  # ...?activation=true
+  def schedule_report
+    if params[:errors] == true
+      puts "ERRORS!"
+    end
 
-  def schedule_activation_success
-    message_options = { results: mock_results }
-    GtfsImportMailer.schedule_activation_success(message_options).deliver_now
+    message_options = if params[:errors]
+      { results: error_results }
+    elsif params[:activation]
+      { results: activation_results }
+    else
+      { results: verification_results }
+    end
+
+    GtfsImportMailer.schedule_report(message_options).deliver_now
   end
 
   private
 
-  def mock_results
+  def error_results
+    blank_results.merge(errors: [ { class: "MyError", message: "Oh, something went wrong" } ])
+  end
+
+  def activation_results
+    blank_results.merge(new_schedule_activation: true)
+  end
+
+  def verification_results
+    blank_results.merge(new_schedule_activation: false)
+  end
+
+  def blank_results
     {
-      :source_url=>"http://www.my-site.com/gtfs-feed.zip",
-      :destination_path=>"./tmp/google_transit.zip",
-      :destructive_mode=>false,
-      :started_at=>DateTime.now.to_s,
-      :ended_at=>"",
-      :hosted_schedule=> {a:1, b:2},
-      :errors=>[]
+      source_url: "http://www.my-site.com/gtfs-feed.zip",
+      destructive: false,
+      start_at: (DateTime.now - 3.minutes).to_s,
+      end_at: DateTime.now.to_s
     }
   end
 
