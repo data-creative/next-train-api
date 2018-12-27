@@ -96,7 +96,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
     before(:each) do
       stub_download_zip(source_url)
-      allow(import).to receive(:new_hosted_schedule?).and_return(true)
+      allow(import).to receive(:schedule_verification?).and_return(false)
     end
 
     it "should posess a start_at and an end_at" do

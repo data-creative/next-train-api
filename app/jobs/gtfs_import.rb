@@ -41,7 +41,10 @@ class GtfsImport < ApplicationJob
       results[:hosted_schedule] = hosted_schedule.try(:serializable_hash)
       #results[:active_schedule] = active_schedule.try(:serializable_hash)
 
-      if new_hosted_schedule?
+      if schedule_verification?
+        results[:schedule_verification] = true
+        logger.info{ "VERIFIED EXISTING SCHEDULE" }
+      else
         results[:new_schedule] = true
         logger.info { "FOUND NEW SCHEDULE: #{hosted_schedule.serializable_hash} \nPROCESSING..." }
         delete_destination
@@ -50,9 +53,6 @@ class GtfsImport < ApplicationJob
         hosted_schedule.activate!
         results[:schedule_activation] = true
         logger.info{ "ACTIVATED NEW SCHEDULE!" }
-      else
-        results[:schedule_verification] = true
-        logger.info{ "VERIFIED EXISTING SCHEDULE" }
       end
     rescue => e
       handle_error(e)
@@ -69,8 +69,8 @@ class GtfsImport < ApplicationJob
     destructive == true
   end
 
-  def new_hosted_schedule?
-    active_schedule && hosted_schedule && active_schedule != hosted_schedule
+  def schedule_verification?
+    hosted_schedule && hosted_schedule == active_schedule
   end
 
   def hosted_schedule
