@@ -18,7 +18,7 @@
       <% if @errors %>
       <div id="errors">
         <p>Errors:</p>
-        <ul>
+        <ul style="list-style-type:none;">
         <% @errors.each do |err| %>
           <li><pre><%= JSON.pretty_generate(err) %></pre></li>
         <% end %>

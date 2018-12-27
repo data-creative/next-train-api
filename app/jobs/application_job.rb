@@ -18,7 +18,7 @@ class ApplicationJob < ActiveJob::Base
   def clock_out
     @end_at = Time.zone.now
     results[:end_at] = @end_at.to_s
-    logger.info{ "JOB SUCCESSFUL AFTER #{duration_seconds} SECONDS" }
+    logger.info{ "JOB ENDED AFTER #{duration_seconds} SECONDS" }
     @end_at
   end
 

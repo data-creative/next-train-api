@@ -63,8 +63,8 @@ class GtfsImport < ApplicationJob
     clock_out
     logger.info { "SENDING SCHEDULE REPORT: #{results}" }
     #schedule_report_email.deliver_now # later
-    #GtfsImportMailer.schedule_report(results: results).deliver_now # later
-    GtfsImportMailer.schedule_report(results: results).deliver_later
+    GtfsImportMailer.schedule_report(results: results).deliver_now # later
+    #GtfsImportMailer.schedule_report(results: results).deliver_later
     results
   end
 
