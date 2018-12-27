@@ -32,14 +32,15 @@ RSpec.shared_context "schedule report email options" do
   let(:activation_results) {
     blank_results.merge(
       hosted_schedule: hosted_schedule,
-      active_schedule: active_schedule,
-      new_schedule_activation: true
+      #active_schedule: active_schedule,
+      schedule_activation: true
     )
   }
 
   let(:verification_results) {
     blank_results.merge(
-      new_schedule_activation: false
+      hosted_schedule: hosted_schedule,
+      schedule_verification: true
     )
   }
 
