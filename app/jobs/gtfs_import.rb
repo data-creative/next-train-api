@@ -30,7 +30,6 @@ class GtfsImport < ApplicationJob
 
   def perform
     clock_in
-
     begin
       logger.info { "INSPECTING SCHEDULE HOSTED AT: #{source_url.upcase}" }
 
@@ -59,12 +58,10 @@ class GtfsImport < ApplicationJob
       handle_error(e)
     end
 
-    #pp results
     clock_out
     logger.info { "SENDING SCHEDULE REPORT: #{results}" }
-    #schedule_report_email.deliver_now # later
-    GtfsImportMailer.schedule_report(results: results).deliver_now # later
-    #GtfsImportMailer.schedule_report(results: results).deliver_later
+    #GtfsImportMailer.schedule_report(results: results).deliver_now
+    GtfsImportMailer.schedule_report(results: results).deliver_later
     results
   end
 

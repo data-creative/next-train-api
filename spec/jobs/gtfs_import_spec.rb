@@ -96,6 +96,7 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
     before(:each) do
       stub_download_zip(source_url)
+      allow(import).to receive(:new_hosted_schedule?).and_return(true)
     end
 
     it "should posess a start_at and an end_at" do
@@ -141,14 +142,14 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     describe "mailer" do
       let(:start_at) { "2018-12-26 16:00:00 -0500" }
       let(:end_at) { "2018-12-26 16:00:00 -0500" } # because time is frozen
-      #let(:end_at) { "2018-12-26 16:03:00 -0500" }
       let(:results) { {
         errors: [],
         source_url: "http://www.my-site.com/gtfs-feed.zip",
         destructive: false,
         start_at: start_at,
         hosted_schedule: import.hosted_schedule.serializable_hash,
-        schedule_verification: true,
+        new_schedule: true,
+        schedule_activation: true,
         end_at: end_at
       } }
       let(:mail_options) { { results: results } }
