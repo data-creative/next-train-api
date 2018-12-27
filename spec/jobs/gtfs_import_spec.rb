@@ -4,13 +4,13 @@ require_relative '../support/gtfs_import_helpers'
 RSpec.describe GtfsImport, "#destructive?", type: :job do
   let(:source_url){ "http://www.my-site.com/gtfs-feed.zip"}
   let(:import){ GtfsImport.new(:source_url => source_url)}
-  let(:destructive_import){ GtfsImport.new(:source_url => source_url, :destructive => true)}
-  let(:nondestructive_import){ GtfsImport.new(:source_url => source_url, :destructive => false)}
+  let(:destructive_job){ GtfsImport.new(:source_url => source_url, :destructive => true)}
+  let(:nondestructive_job){ GtfsImport.new(:source_url => source_url, :destructive => false)}
 
   it "should properly indicate whether or not the :destructive option was invoked" do
     expect(import.destructive?).to eql(false)
-    expect(destructive_import.destructive?).to eql(true)
-    expect(nondestructive_import.destructive?).to eql(false)
+    expect(destructive_job.destructive?).to eql(true)
+    expect(nondestructive_job.destructive?).to eql(false)
   end
 end
 
@@ -174,22 +174,22 @@ RSpec.describe GtfsImport, "#perform", type: :job do
       :content_length => headers["content-length"].first.to_i,
       :etag => headers["etag"].first.tr('"','')
     }) }
-    let(:destructive_import){ GtfsImport.new(:source_url => source_url, :destructive => true)}
+    let(:destructive_job){ GtfsImport.new(:source_url => source_url, :destructive => true)}
 
     before(:each) do
       stub_download_zip(source_url)
     end
 
     it "should posess a start_at and an end_at " do
-      destructive_import.perform
-      expect(destructive_import.start_at).to_not be_blank
-      expect(destructive_import.end_at).to_not be_blank
+      destructive_job.perform
+      expect(destructive_job.start_at).to_not be_blank
+      expect(destructive_job.end_at).to_not be_blank
     end
 
     it "should proceed regardless of whether or not the hosted schedule matches the active schedule" do
-      expect(destructive_import).to receive(:transform_and_load)
-      expect(destructive_import).to receive(:activate)
-      destructive_import.perform
+      expect(destructive_job).to receive(:transform_and_load)
+      #expect(destructive_job.hosted_schedule).to receive(:activate!)
+      destructive_job.perform
     end
   end
 

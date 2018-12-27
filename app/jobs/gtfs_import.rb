@@ -61,7 +61,6 @@ class GtfsImport < ApplicationJob
 
     clock_out
 
-    #binding.pry
     logger.info { "SENDING SCHEDULE REPORT: #{results}" }
     schedule_report_email.deliver_now # later
     results
