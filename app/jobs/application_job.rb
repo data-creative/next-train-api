@@ -10,14 +10,14 @@ class ApplicationJob < ActiveJob::Base
 
   def clock_in
     @start_at = Time.zone.now
-    results[:start_at] = @start_at
+    results[:start_at] = @start_at.to_s
     logger.info{ "JOB STARTING AT #{@start_at.to_s}" }
     @start_at
   end
 
   def clock_out
     @end_at = Time.zone.now
-    results[:end_at] = @end_at
+    results[:end_at] = @end_at.to_s
     logger.info{ "JOB SUCCESSFUL AFTER #{duration_seconds} SECONDS" }
     @end_at
   end

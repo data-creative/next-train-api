@@ -40,7 +40,7 @@ class GtfsImport < ApplicationJob
       end
 
       results[:hosted_schedule] = hosted_schedule.try(:serializable_hash)
-      results[:active_schedule] = active_schedule.try(:serializable_hash)
+      #results[:active_schedule] = active_schedule.try(:serializable_hash)
 
       if new_hosted_schedule?
         results[:new_schedule] = true
@@ -61,8 +61,14 @@ class GtfsImport < ApplicationJob
 
     clock_out
 
+    puts "\n"
+    puts results.keys.to_s
+    puts "\n"
+    #pp results[:hosted_schedule]
+    #binding.pry
     logger.info { "SENDING SCHEDULE REPORT: #{results}" }
-    schedule_report_email.deliver_now # later
+    #schedule_report_email.deliver_now # later
+    GtfsImportMailer.schedule_report(results: results).deliver_now # later
     results
   end
 
@@ -87,9 +93,9 @@ class GtfsImport < ApplicationJob
     Schedule.active_one
   end
 
-  def schedule_report_email
-    GtfsImportMailer.schedule_report(results: results)
-  end
+  #def schedule_report_email
+  #  GtfsImportMailer.schedule_report(results: results)
+  #end
 
   private
 

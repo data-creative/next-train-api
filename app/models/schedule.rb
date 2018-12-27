@@ -25,6 +25,10 @@ class Schedule < ApplicationRecord
     update!(:active => true)
   end
 
+  def serializable_hash
+    { id: id, source_url: source_url, published_at: published_at.to_s, content_length: content_length, etag: etag, active: active }
+  end
+
   private
 
   def at_most_one_active_schedule

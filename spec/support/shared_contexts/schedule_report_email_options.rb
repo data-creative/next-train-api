@@ -14,8 +14,8 @@ RSpec.shared_context "schedule report email options" do
     content_length: 6921,
     etag: "9876-919fh430wmsl",
     active: true,
-    created_at: "2017-05-21 15:12:42 -0400",
-    updated_at: "2017-05-21 15:13:00 -0400"
+    #created_at: "2017-05-21 15:12:42 -0400",
+    #updated_at: "2017-05-21 15:13:00 -0400"
   } }
 
   let(:activation_results) {
