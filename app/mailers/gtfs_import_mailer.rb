@@ -9,9 +9,9 @@ class GtfsImportMailer < ApplicationMailer
     @new_schedule_activation = @results.try(:new_schedule_activation) == true
     @errors = @results.try(:errors)
 
-    @subject = if @results && @errors.any?
+    @subject = if @errors
       "GTFS Schedule Error(s)"
-    elsif @results && @new_schedule_activation == true
+    elsif @new_schedule_activation == true
       "GTFS Schedule Activation!"
     elsif @results
       "GTFS Schedule Verification"
