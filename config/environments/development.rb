@@ -60,6 +60,9 @@ Rails.application.configure do
     g.factory_girl
   end
 
+  # sets Rails.logger so you can use it as an alternative to "puts" and prevent logging in other environments
+  config.logger = Logger.new(STDOUT)
+
   #
   # Configure Devise.
   #

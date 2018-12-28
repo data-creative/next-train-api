@@ -5,17 +5,13 @@ FactoryGirl.define do
     source_url "http://www.my-transit-agency.com/google_transit.zip"
     active false
 
-    factory :active_schedule do
+    trait :active do
       active true
     end
 
-    factory :inactive_schedule do
+    trait :inactive do
       active false
     end
-
-    #trait :inactive do
-    #  active false
-    #end
 
     #trait :with_etag do
     #  etag "1abc-876543db34567"

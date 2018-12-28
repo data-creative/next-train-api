@@ -21,7 +21,7 @@ RSpec.describe Schedule, "validations", type: :model do
 
   describe "#at_most_one_active_schedule" do
     context "when activating a schedule without first deactivating others" do
-      let!(:active_schedule){ create(:active_schedule)}
+      let!(:active_schedule){ create(:schedule, :active)}
       let(:schedule){ create(:schedule) }
 
       before(:each) do

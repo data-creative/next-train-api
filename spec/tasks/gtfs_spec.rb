@@ -27,8 +27,8 @@ RSpec.describe "gtfs" do
     #  end
     #end
 
-    it "should perform a forced GtfsImport" do
-      #expect_any_instance_of(GtfsImport).to receive(:initialize).with(hash_including(:forced => true)) # warns... "warning: removing `initialize' may cause serious problems"
+    it "should perform a desctructive GtfsImport" do
+      #expect_any_instance_of(GtfsImport).to receive(:initialize).with(hash_including(destructive: true)) # warns... "warning: removing `initialize' may cause serious problems"
       expect_any_instance_of(GtfsImport).to receive(:perform)
       Rake.application["gtfs:force_import"].invoke
     end

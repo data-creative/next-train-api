@@ -59,11 +59,11 @@ RSpec.describe Calendar, ".in_service_on", type: :model do
   let(:pre_service_date){ service_start_date - 10.days }
   let(:post_service_date){ service_end_date + 10.days }
 
-  let(:schedule){ create(:active_schedule) }
+  let(:schedule){ create(:schedule, :active) }
   let(:calendar){ create(:calendar, :all_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
   let(:empty_calendar){ create(:calendar, :no_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
 
-  let(:old_schedule){ create(:inactive_schedule) }
+  let(:old_schedule){ create(:schedule, :inactive) }
   let(:old_calendar){ create(:calendar, :all_days, :schedule_id => old_schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
 
   describe "active schedule conditions" do

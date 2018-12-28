@@ -11,6 +11,8 @@ env:
   global:
     - DATABASE_USER="travis"
     - DATABASE_PASSWORD=""
+    - MAILER_HOST="next-train-example.com"
+    - ADMIN_EMAIL="someone@gmail.com"
     - CC_TEST_REPORTER_ID=1ce5201f57b288a53e33ae8768ed7700578dffce593c814deceb0051bc208d24
     - COVERAGE=true
 before_script:

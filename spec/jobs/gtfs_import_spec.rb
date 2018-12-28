@@ -1,16 +1,16 @@
 require 'rails_helper'
 require_relative '../support/gtfs_import_helpers'
 
-RSpec.describe GtfsImport, "#forced?", type: :job do
+RSpec.describe GtfsImport, "#destructive?", type: :job do
   let(:source_url){ "http://www.my-site.com/gtfs-feed.zip"}
   let(:import){ GtfsImport.new(:source_url => source_url)}
-  let(:forced_import){ GtfsImport.new(:source_url => source_url, :forced => true)}
-  let(:nonforced_import){ GtfsImport.new(:source_url => source_url, :forced => false)}
+  let(:destructive_job){ GtfsImport.new(:source_url => source_url, :destructive => true)}
+  let(:nondestructive_job){ GtfsImport.new(:source_url => source_url, :destructive => false)}
 
-  it "should properly indicate whether or not the :forced option was invoked" do
-    expect(import.forced?).to eql(false)
-    expect(forced_import.forced?).to eql(true)
-    expect(nonforced_import.forced?).to eql(false)
+  it "should properly indicate whether or not the :destructive option was invoked" do
+    expect(import.destructive?).to eql(false)
+    expect(destructive_job.destructive?).to eql(true)
+    expect(nondestructive_job.destructive?).to eql(false)
   end
 end
 
@@ -20,20 +20,20 @@ RSpec.describe GtfsImport, "#perform", type: :job do
   let(:imported_schedule){ Schedule.where(:source_url => source_url, :published_at => last_modified_at, :etag => etag, :content_length => content_length).first }
 
   context "when unsuccessful due to errors ocurring after metadata extraction" do
-    let!(:pre_import_active_schedule){ create(:active_schedule) }
+    let!(:pre_import_active_schedule){ create(:schedule, :active) }
 
     before(:each) do
       stub_download_zip(source_url)
       allow(import).to receive(:transform_and_load).and_raise("OOPS SOME VALIDATION ERROR OR SOMETHING")
     end
 
-    it "should posess a started_at but not an ended_at " do
+    it "should posess a start_at and an end_at" do
       begin
         import.perform
       rescue
       ensure
-        expect(import.started_at).to_not be_blank
-        expect(import.ended_at).to be_blank
+        expect(import.start_at).to_not be_blank
+        expect(import.end_at).to_not be_blank
       end
     end
 
@@ -55,6 +55,41 @@ RSpec.describe GtfsImport, "#perform", type: :job do
         expect(imported_schedule.active?).to eql(false)
       end
     end
+
+    describe "mailer" do
+      let(:start_at) { "2018-12-26 16:00:00 -0500" }
+      let(:end_at) { "2018-12-26 16:00:00 -0500" } # because time is frozen
+      #let(:end_at) { "2018-12-26 16:03:00 -0500" }
+      let(:my_error) { {:class=>"RuntimeError", :message=>"OOPS SOME VALIDATION ERROR OR SOMETHING"} }
+      let(:results) { {
+        errors: [my_error],
+        source_url: "http://www.my-site.com/gtfs-feed.zip",
+        destructive: false,
+        start_at: start_at,
+        hosted_schedule: import.hosted_schedule.serializable_hash, # in this example, error occurred after hosted schedule retrieved
+        new_schedule: true, # in this example, error occurred after new schedule successfully found
+        end_at: end_at,
+        duration_seconds: 0.0,
+        duration_readable: "00:00:00"
+      } }
+      let(:mail_options) { { results: results } }
+
+      let(:mailer) { class_double(GtfsImportMailer) }
+      let(:message) { instance_double(ActionMailer::MessageDelivery) }
+
+      before(:each) do
+        Timecop.freeze( start_at )
+        #allow(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message) # not sure why the test is passing without this line...
+      end
+
+      after { Timecop.return }
+
+      it "should notify admins" do
+        expect(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message)
+        expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
+        import.perform
+      end
+    end
   end
 
   context "when successful" do
@@ -63,19 +98,22 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
     before(:each) do
       stub_download_zip(source_url)
-      import.perform
+      allow(import).to receive(:schedule_verification?).and_return(false)
     end
 
-    it "should posess a started_at and an ended_at " do
-      expect(import.started_at).to_not be_blank
-      expect(import.ended_at).to_not be_blank
+    it "should posess a start_at and an end_at" do
+      import.perform
+      expect(import.start_at).to_not be_blank
+      expect(import.end_at).to_not be_blank
     end
 
     it "should persist transit schedule metadata" do
+      import.perform
       expect(imported_schedule).to_not be_blank
     end
 
     it "should persist transit schedule data" do
+      import.perform
       expect(Agency.count).to eql(1)
       expect(Calendar.count).to eql(6)
       expect(CalendarDate.count).to eql(8)
@@ -86,43 +124,81 @@ RSpec.describe GtfsImport, "#perform", type: :job do
     end
 
     it "should persist stop latitude and longitude to 8 decimal places" do
+      import.perform
       expect(imported_stop.latitude.to_f).to eql(41.29771887)
       expect(imported_stop.longitude.to_f).to eql(-72.92673111)
     end
 
     it "should consolidate duplicative sequential stop times, using the earliest arrival and latest departure" do
+      import.perform
       expect(imported_consolidated_stop_times.count).to eql(1)
       expect(imported_consolidated_stop_times.first.arrival_time).to eql("17:44:00")
       expect(imported_consolidated_stop_times.first.departure_time).to eql("17:48:00")
     end
 
     it "should mark the imported schedule as active" do
+      import.perform
       expect(imported_schedule.active?).to eql(true)
+    end
+
+    describe "mailer" do
+      let(:start_at) { "2018-12-26 16:00:00 -0500" }
+      let(:end_at) { "2018-12-26 16:00:00 -0500" } # because time is frozen
+      let(:results) { {
+        errors: [],
+        source_url: "http://www.my-site.com/gtfs-feed.zip",
+        destructive: false,
+        start_at: start_at,
+        hosted_schedule: import.hosted_schedule.serializable_hash,
+        new_schedule: true,
+        schedule_activation: true,
+        end_at: end_at,
+        duration_seconds: 0.0,
+        duration_readable: "00:00:00"
+      } }
+      let(:mail_options) { { results: results } }
+
+      let(:mailer) { class_double(GtfsImportMailer) }
+      let(:message) { instance_double(ActionMailer::MessageDelivery) }
+
+      before(:each) do
+        Timecop.freeze( start_at )
+        #allow(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message) # not sure why the test is passing without this line...
+      end
+
+      after { Timecop.return }
+
+      it "should send a success message" do
+        expect(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message)
+        expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
+        import.perform
+      end
     end
   end
 
-  context "when forced" do
-    let!(:pre_import_hosted_active_schedule){ create(:active_schedule, {
+  context "when destructive" do
+    let!(:pre_import_hosted_active_schedule){ create(:schedule, :active, {
       :published_at => headers["last-modified"].first.to_datetime,
       :content_length => headers["content-length"].first.to_i,
       :etag => headers["etag"].first.tr('"','')
     }) }
-    let(:forced_import){ GtfsImport.new(:source_url => source_url, :forced => true)}
+    let(:destructive_job){ GtfsImport.new(:source_url => source_url, :destructive => true)}
 
     before(:each) do
       stub_download_zip(source_url)
     end
 
-    it "should posess a started_at and an ended_at " do
-      forced_import.perform
-      expect(forced_import.started_at).to_not be_blank
-      expect(forced_import.ended_at).to_not be_blank
+    it "should posess a start_at and an end_at " do
+      destructive_job.perform
+      expect(destructive_job.start_at).to_not be_blank
+      expect(destructive_job.end_at).to_not be_blank
     end
 
     it "should proceed regardless of whether or not the hosted schedule matches the active schedule" do
-      expect(forced_import).to receive(:transform_and_load)
-      expect(forced_import).to receive(:activate)
-      forced_import.perform
+      expect(destructive_job).to receive(:transform_and_load)
+      #expect(destructive_job.hosted_schedule).to receive(:activate!)
+      destructive_job.perform
     end
   end
+
 end

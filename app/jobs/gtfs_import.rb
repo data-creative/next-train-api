@@ -12,7 +12,7 @@ require_relative "./gtfs_import/zip_file_parsers/trips_file_parser"
 class GtfsImport < ApplicationJob
   queue_as :default
 
-  attr_reader :source_url, :destination_path, :forced
+  attr_reader :source_url, :destination_path, :destructive
 
   GTFS_SOURCE_URL = ENV.fetch('GTFS_SOURCE_URL', "OOPS")
 
@@ -22,48 +22,55 @@ class GtfsImport < ApplicationJob
   def initialize(options = {})
     @source_url = options[:source_url] || GTFS_SOURCE_URL
     @destination_path = options[:destination_path] || "./tmp/google_transit.zip"
-    @forced = (options[:forced] == true)
+    @destructive = (options[:destructive] == true)
     super
+    results[:source_url] = @source_url
+    results[:destructive] = @destructive
   end
 
   def perform
+    clock_in
     begin
-      start
-      logger.info { "IMPORTING GTFS FEED FROM #{source_url}" }
-      hosted_schedule.destroy if forced?
-      if hosted_schedule != active_schedule
+      logger.info { "INSPECTING SCHEDULE HOSTED AT: #{source_url.upcase}" }
+
+      if destructive?
+        logger.info { "DESTROYING SCHEDULE: #{hosted_schedule.try(:serializable_hash)}" }
+        hosted_schedule.try(:destroy)
+      end
+
+      results[:hosted_schedule] = hosted_schedule.try(:serializable_hash)
+      #results[:active_schedule] = active_schedule.try(:serializable_hash)
+
+      if schedule_verification?
+        results[:schedule_verification] = true
+        logger.info{ "VERIFIED EXISTING SCHEDULE" }
+      else
+        results[:new_schedule] = true
+        logger.info { "FOUND NEW SCHEDULE: #{hosted_schedule.serializable_hash} \nPROCESSING..." }
         delete_destination
         extract
         transform_and_load
-        activate
-        # todo: send schedule activation (import success) email
+        hosted_schedule.activate!
+        results[:schedule_activation] = true
+        logger.info{ "ACTIVATED NEW SCHEDULE!" }
       end
-      finish
     rescue => e
-      logger.error { "#{e.class} -- #{e.message}"}
-      errors << {class: e.class.to_s, message: e.message}
-      # todo: send schedule activation error (import failure/error) email
-      # todo: send error to error-reporting service (maybe)
+      handle_error(e)
     end
-    logger.info { results }
-    # todo: send event with results
-    results
-  end #TODO: destroy existing data only after activating the new schedule only after data finishes loading
 
-  def results
-    {
-      source_url: source_url,
-      destination_path: destination_path,
-      forced: forced?,
-      started_at: started_at,
-      ended_at: ended_at,
-      #hosted_schedule: hosted_schedule.serializable_hash
-      errors: errors
-    }
+    clock_out
+    logger.info { "SENDING SCHEDULE REPORT: #{results}" }
+    report = GtfsImportMailer.schedule_report(results: results)
+    Rails.env.development? ? report.deliver_now : report.deliver_later
+    results
   end
 
-  def forced?
-    forced == true
+  def destructive?
+    destructive == true
+  end
+
+  def schedule_verification?
+    hosted_schedule && hosted_schedule == active_schedule
   end
 
   def hosted_schedule
@@ -75,11 +82,15 @@ class GtfsImport < ApplicationJob
     }).first_or_create!
   end
 
-  private
-
   def active_schedule
     Schedule.active_one
   end
+
+  #def schedule_report_email
+  #  GtfsImportMailer.schedule_report(results: results)
+  #end
+
+  private
 
   def response
     @response ||= HTTParty.get(source_url)
@@ -110,11 +121,6 @@ class GtfsImport < ApplicationJob
       TripsFileParser.new(options).perform #NOTE: depends on successful completion of RoutesFileParser
       StopTimesFileParser.new(options).perform #NOTE: depends on successful completion of StopsFileParser and TripsFileParser
     end
-  end
-
-  def activate
-    logger.info{ "ACTIVATING SCHEDULE" }
-    hosted_schedule.activate!
   end
 
 end

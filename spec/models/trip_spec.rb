@@ -40,7 +40,7 @@ RSpec.describe Trip, ".in_service_on" do
   let(:service_end_date){ "2017-12-31".to_date }
   let(:service_date){ rand(service_start_date..service_end_date) }
 
-  let(:schedule){ create(:active_schedule) }
+  let(:schedule){ create(:schedule, :active) }
 
   let(:calendar){ create(:calendar, :all_days, :schedule_id => schedule.id, :start_date => service_start_date, :end_date => service_end_date )}
   let(:trip){ create(:trip, :schedule_id => schedule.id, :calendar => calendar) }

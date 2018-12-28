@@ -1,0 +1,34 @@
+
+      <h1><%= @subject %></h1>
+
+      <% if @source_url %>
+      <div id="source-url">
+        <p>Source URL:</p>
+        <p><pre><%= @source_url %></pre></p>
+      </div>
+      <% end %>
+
+      <% if @start_at && @end_at && @duration_readable %>
+      <div id="job-performance-times">
+        <p>Job performance:</p>
+        <p><pre><%= JSON.pretty_generate({start_at: @start_at, end_at: @end_at, duration: @duration_readable}) %></pre></p>
+      </div>
+      <% end %>
+
+      <% if @hosted_schedule %>
+      <div id="hosted-schedule">
+        <p>Hosted Schedule:</p>
+        <p><pre><%= JSON.pretty_generate(@hosted_schedule) %></pre></p>
+      </div>
+      <% end %>
+
+      <% if @errors %>
+      <div id="errors">
+        <p>Errors:</p>
+        <ul style="list-style-type:none;">
+        <% @errors.each do |err| %>
+          <li><pre><%= JSON.pretty_generate(err) %></pre></li>
+        <% end %>
+        </ul>
+      </div>
+      <% end %>

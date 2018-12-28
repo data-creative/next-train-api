@@ -43,7 +43,7 @@ RSpec.describe Api::V1::ApiController, type: :controller do
     end
 
     context "when receiving valid parameters" do
-      let(:active_schedule){ create(:active_schedule) }
+      let(:active_schedule){ create(:schedule, :active) }
       let!(:origin){ create(:stop, :guid => "BRN", :schedule_id => active_schedule.id)}
       let!(:destination){ create(:stop, :guid => "ST", :schedule_id => active_schedule.id)}
 

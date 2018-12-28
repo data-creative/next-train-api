@@ -35,7 +35,7 @@ end
 
 RSpec.describe Stop, ".active", type: :model do
   let!(:stop){ create(:stop) }
-  let(:active_schedule){ create(:active_schedule)}
+  let(:active_schedule){ create(:schedule, :active)}
   let!(:active_stop){ create(:stop, :schedule_id => active_schedule.id)}
 
   it "returns all stops belonging to the active schedule" do
