@@ -12,7 +12,7 @@ RSpec.describe GtfsImportMailer, type: :mailer do
         let(:results_keys) { [ :source_url, :start_at, :end_at, :destructive, :duration_readable, :duration_seconds, :hosted_schedule, :schedule_activation ] }
         let(:expected_text){ [
           subject, "Source URL:",
-          "Job performance", activation_results[:start_at], activation_results[:end_at], activation_results[:duration_readable],
+          "Job performance", activation_results[:duration_readable], #activation_results[:start_at], activation_results[:end_at],
           "Hosted Schedule:", hosted_schedule[:etag], hosted_schedule[:published_at]
         ] }
       end
@@ -27,7 +27,7 @@ RSpec.describe GtfsImportMailer, type: :mailer do
         let(:results_keys) { [ :source_url, :start_at, :end_at, :destructive, :duration_readable, :duration_seconds, :hosted_schedule, :schedule_verification ] }
         let(:expected_text){ [
           subject, "Source URL:",
-          "Job performance", activation_results[:start_at], activation_results[:end_at], activation_results[:duration_readable],
+          "Job performance", activation_results[:duration_readable], #activation_results[:start_at], activation_results[:end_at],
           "Hosted Schedule:", hosted_schedule[:etag], hosted_schedule[:published_at]
         ] }
       end
@@ -42,7 +42,7 @@ RSpec.describe GtfsImportMailer, type: :mailer do
         let(:results_keys) { [ :source_url, :start_at, :end_at, :destructive, :duration_readable, :duration_seconds, :errors] }
         let(:expected_text){ [
           subject, "Source URL:",
-          "Job performance", activation_results[:start_at], activation_results[:end_at], activation_results[:duration_readable],
+          "Job performance", activation_results[:duration_readable], #activation_results[:start_at], activation_results[:end_at],
           "Errors:", "MyError", "Oh, something went wrong"
         ] }
       end
