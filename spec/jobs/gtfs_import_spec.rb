@@ -86,7 +86,8 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
       it "should notify admins" do
         expect(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message)
-        expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
+        #expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
+        expect(message).to receive(:deliver_now)
         import.perform
       end
     end
@@ -170,7 +171,8 @@ RSpec.describe GtfsImport, "#perform", type: :job do
 
       it "should send a success message" do
         expect(GtfsImportMailer).to receive(:schedule_report).with(mail_options).and_return(message)
-        expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
+        #expect(message).to receive(:deliver_later).and_return(kind_of(ActionMailer::DeliveryJob))
+        expect(message).to receive(:deliver_now)
         import.perform
       end
     end
