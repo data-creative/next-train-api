@@ -45,6 +45,20 @@ Rails.application.configure do
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 
+
+  # sets Rails.logger so you can use it as an alternative to "puts" and prevent logging in other environments
+  #config.logger = Logger.new(STDOUT)
+  # https://github.com/rails/sprockets-rails/issues/376#issuecomment-287560399
+  logger = ActiveSupport::Logger.new(STDOUT)
+  logger.formatter = config.log_formatter
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
+
+
+
+
+
+
+
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
@@ -59,9 +73,6 @@ Rails.application.configure do
     g.helper = false
     g.factory_girl
   end
-
-  # sets Rails.logger so you can use it as an alternative to "puts" and prevent logging in other environments
-  config.logger = Logger.new(STDOUT)
 
   #
   # Configure Devise.
