@@ -11,16 +11,16 @@ class GtfsImportMailer < ApplicationMailer
     #@duration_seconds = @results[:duration_seconds]
     @duration_readable = @results[:duration_readable]
     @hosted_schedule = @results[:hosted_schedule]
-    @schedule_activation = @results[:schedule_activation] == true
-    @schedule_verification = @results[:schedule_verification] == true
+    @schedule_activation = @results[:schedule_activation]
+    @schedule_verification = @results[:schedule_verification]
     @errors = @results[:errors]
 
-    @subject = if @errors
-      "GTFS Schedule Processing Failure"
-    elsif @schedule_activation == true
+    @subject = if @schedule_activation == true
       "GTFS Schedule Activation!"
     elsif @schedule_verification == true
       "GTFS Schedule Verification"
+    elsif @errors.any?
+      "GTFS Schedule Processing Failure"
     else
       raise "GTFS IMPORT EMAIL SUBJECT COMPILATION FAILURE"
     end

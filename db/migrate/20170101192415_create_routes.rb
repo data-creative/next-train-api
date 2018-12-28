@@ -6,7 +6,7 @@ class CreateRoutes < ActiveRecord::Migration[5.0]
       t.string :agency_guid
       t.string :short_name
       t.string :long_name
-      t.string :description
+      t.string :description # FYI: should be t.text
       t.integer :code, :length => 4 # @see https://developers.google.com/transit/gtfs/reference/extended-route-types
       t.string :url
       t.string :color, :length => 6

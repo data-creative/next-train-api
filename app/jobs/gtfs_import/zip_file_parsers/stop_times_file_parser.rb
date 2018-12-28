@@ -16,10 +16,14 @@ class StopTimesFileParser < ZipFileParser
       # there are sequential stop_times which share a composite key but differ in sequence.
       # @see https://gist.github.com/s2t2/0d2929e0ecaba85823e1314935e7941e
       # consider importing all records and adding stop_sequence to the composite key.
+      # FYI: if a previous import has failed, this condition will trigger erroneously, so consider running a forced import to destroy the persisted versions
       if stop_time.persisted?
-        raise UnexpectedStopTime.new(row.to_h) unless stop_time.stop_sequence + 1 == row.to_h['stop_sequence'].to_i
-        @logger.info{ "... CONSOLIDATING STOP TIMES #{stop_time.trip_guid}-#{stop_time.stop_guid} (#{stop_time.stop_sequence} vs #{row['stop_sequence']})" }
-        stop_time.update!(:departure_time => row["departure_time"], :stop_sequence => row["stop_sequence"].to_i)
+        if stop_time.stop_sequence + 1 == row.to_h['stop_sequence'].to_i
+          @logger.warn{ "... CONSOLIDATING STOP TIMES #{stop_time.trip_guid}-#{stop_time.stop_guid} (#{stop_time.stop_sequence} vs #{row['stop_sequence']})" }
+          stop_time.update!(:departure_time => row["departure_time"], :stop_sequence => row["stop_sequence"].to_i)
+        else
+          raise UnexpectedStopTime.new(row.to_h)
+        end
       else
         stop_time.update!({
           :stop_sequence => row["stop_sequence"].to_i,

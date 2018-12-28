@@ -8,13 +8,6 @@
       </div>
       <% end %>
 
-      <% if @start_at && @end_at && @duration_readable %>
-      <div id="job-performance-times">
-        <p>Job performance:</p>
-        <p><pre><%= JSON.pretty_generate({start_at: @start_at, end_at: @end_at, duration: @duration_readable}) %></pre></p>
-      </div>
-      <% end %>
-
       <% if @hosted_schedule %>
       <div id="hosted-schedule">
         <p>Hosted Schedule:</p>
@@ -22,7 +15,7 @@
       </div>
       <% end %>
 
-      <% if @errors %>
+      <% if @errors && @errors.any? %>
       <div id="errors">
         <p>Errors:</p>
         <ul style="list-style-type:none;">
@@ -30,5 +23,12 @@
           <li><pre><%= JSON.pretty_generate(err) %></pre></li>
         <% end %>
         </ul>
+      </div>
+      <% end %>
+
+      <% if @start_at && @end_at && @duration_readable %>
+      <div id="job-performance-times">
+        <p>Job performance:</p>
+        <p><pre><%= JSON.pretty_generate({start_at: @start_at, end_at: @end_at, duration: @duration_readable}) %></pre></p>
       </div>
       <% end %>
