@@ -59,9 +59,7 @@ class GtfsImport < ApplicationJob
     end
 
     clock_out
-    logger.info { "SENDING SCHEDULE REPORT: #{results}" }
-    report = GtfsImportMailer.schedule_report(results: results)
-    Rails.env.development? ? report.deliver_now : report.deliver_later
+    send_results_email
     results
   end
 
@@ -86,9 +84,12 @@ class GtfsImport < ApplicationJob
     Schedule.active_one
   end
 
-  #def schedule_report_email
-  #  GtfsImportMailer.schedule_report(results: results)
-  #end
+  def send_results_email
+    logger.info { "SENDING SCHEDULE REPORT: #{results}" }
+    report = GtfsImportMailer.schedule_report(results: results)
+    Rails.env.development? ? report.deliver_now : report.deliver_later
+    return true
+  end
 
   private
 
