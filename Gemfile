@@ -12,7 +12,7 @@ gem 'jbuilder', '~> 2.5'
 
 #gem 'devise_token_auth'
 #gem 'omniauth' # for future use with devise_token_auth
-gem 'devise', '~> 4.2.0'
+gem 'devise' #, '~> 4.2.0'
 gem 'httparty' #, '~> 0.13.3'
 gem 'rubyzip' #, '>= 1.0.0'
 
