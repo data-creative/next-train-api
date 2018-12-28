@@ -10,21 +10,9 @@ heroku login
 
 ## Setting Up Servers from Scratch
 
-In the console, create a new environment variable called `DATABASE_URL`, and set its value to the same thing as `CLEARDB_DATABASE_URL`, except use `mysql2:` instead of `mysql:`.
-
-Set `MAILER_HOST` environment variable to specify which server emails are coming from:
-
-```` sh
-heroku config:set MAILER_HOST="next-train-production.herokuapp.com" -a next-train-production
-heroku config:set MAILER_HOST="next-train-staging.herokuapp.com" -a next-train-staging
-````
-
-Set `ADMIN_EMAIL` environment variable to specify which email address to send notifications:
-
-```` sh
-heroku config:set ADMIN_EMAIL="someone@gmail.com" -a next-train-production
-heroku config:set ADMIN_EMAIL="someone@gmail.com" -a next-train-staging
-````
+In addition to the steps below, for each environment, set an environment variable called `DATABASE_URL`,
+  the value of which should reflect the environment's `CLEARDB_DATABASE_URL`,
+  except it should use `mysql2:` instead of `mysql:`.
 
 ### Staging
 
@@ -34,12 +22,14 @@ heroku git:remote -a next-train-staging
 git remote rename heroku heroku-staging
 heroku config:set BUNDLE_WITHOUT="development:test:docs" -a next-train-staging
 heroku config:set GTFS_SOURCE_URL="http://www.shorelineeast.com/google_transit.zip" -a next-train-staging
+heroku config:set MAILER_HOST="next-train-staging.herokuapp.com" -a next-train-staging
+heroku config:set ADMIN_EMAIL="someone@gmail.com" -a next-train-staging
 heroku addons:create cleardb:ignite -a next-train-staging
 heroku addons:create sendgrid:starter -a next-train-staging
 heroku addons:create scheduler:standard -a next-train-staging
 ````
 
-#### Production
+### Production
 
 ```` sh
 heroku create next-train-production
@@ -47,6 +37,8 @@ heroku git:remote -a next-train-production
 git remote rename heroku heroku-production
 heroku config:set BUNDLE_WITHOUT="development:test:docs" -a next-train-production
 heroku config:set GTFS_SOURCE_URL="http://www.shorelineeast.com/google_transit.zip" -a next-train-production
+heroku config:set MAILER_HOST="next-train-production.herokuapp.com" -a next-train-production
+heroku config:set ADMIN_EMAIL="someone@gmail.com" -a next-train-production
 heroku addons:create cleardb:ignite -a next-train-production
 heroku addons:create sendgrid:starter -a next-train-production
 heroku addons:create scheduler:standard -a next-train-production

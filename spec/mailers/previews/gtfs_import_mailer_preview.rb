@@ -35,7 +35,6 @@ class GtfsImportMailerPreview < ActionMailer::Preview
 
   def error_results
     blank_results.merge(
-      end_at: "",
       errors: [ { class: "MyError", message: "Oh, something went wrong" } ]
     )
   end
