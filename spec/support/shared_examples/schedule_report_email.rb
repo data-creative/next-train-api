@@ -1,3 +1,16 @@
+#
+# @example
+#   it_behaves_like "a schedule report email" do
+#     include_context "schedule report email options"
+#     let(:message_options) { { results: activation_results } }
+#     let(:subject) { "GTFS Schedule Activation!" }
+#     let(:results_keys) { [ :source_url, :start_at, :end_at, :destructive, :duration_readable, :duration_seconds, :hosted_schedule, :schedule_activation ] }
+#     let(:expected_text){ [
+#       subject, "Source URL:",
+#       "Hosted Schedule:", hosted_schedule[:etag], hosted_schedule[:published_at]
+#     ] }
+#   end
+#
 RSpec.shared_examples "a schedule report email" do
   let(:admin_email) { ENV.fetch("ADMIN_EMAIL") }
   let(:mailer_host) { ENV.fetch("MAILER_HOST") }
