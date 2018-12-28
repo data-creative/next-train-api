@@ -87,7 +87,7 @@ class GtfsImport < ApplicationJob
   def send_results_email
     logger.info { "SENDING SCHEDULE REPORT: #{results}" }
     report = GtfsImportMailer.schedule_report(results: results)
-    Rails.env.development? ? report.deliver_now : report.deliver_later
+    report.deliver_now # Rails.env.development? ? report.deliver_now : report.deliver_later
     return true
   end
 
