@@ -3,8 +3,8 @@ class Route < ApplicationRecord
   has_many :trips, ->(route){ where("trips.schedule_id = ?", route.schedule_id) }, :inverse_of => :route, :primary_key => :guid, :foreign_key => :route_guid, :dependent => :destroy
 
   validates_associated :schedule
-  validates_presence_of :schedule_id, :guid, :short_name, :long_name, :code
-  #validate validate_short_or_long_name
+  validates_presence_of :schedule_id, :guid, :code
+  validate :validate_name
   validates_inclusion_of :code, :in => (0..7).to_a
   validates_uniqueness_of :guid, :scope => :schedule_id
 
@@ -23,10 +23,10 @@ class Route < ApplicationRecord
     CLASSIFICATIONS[code]
   end
 
-  #private
-#
-  #def validate_short_or_long_name
-  #  errors.add(:___, "") unless short_name || long_name
-  #end
+  private
+
+  def validate_name
+    errors.add(:name, "Short name and Long name can't both be blank") unless short_name.present? || long_name.present?
+  end
 
 end
