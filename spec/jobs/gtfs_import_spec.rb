@@ -68,7 +68,9 @@ RSpec.describe GtfsImport, "#perform", type: :job do
         start_at: start_at,
         hosted_schedule: import.hosted_schedule.serializable_hash, # in this example, error occurred after hosted schedule retrieved
         new_schedule: true, # in this example, error occurred after new schedule successfully found
-        end_at: end_at
+        end_at: end_at,
+        duration_seconds: 0.0,
+        duration_readable: "00:00:00"
       } }
       let(:mail_options) { { results: results } }
 
@@ -150,7 +152,9 @@ RSpec.describe GtfsImport, "#perform", type: :job do
         hosted_schedule: import.hosted_schedule.serializable_hash,
         new_schedule: true,
         schedule_activation: true,
-        end_at: end_at
+        end_at: end_at,
+        duration_seconds: 0.0,
+        duration_readable: "00:00:00"
       } }
       let(:mail_options) { { results: results } }
 

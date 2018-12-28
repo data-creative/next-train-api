@@ -4,7 +4,9 @@ RSpec.shared_context "schedule report email options" do
     source_url: "http://www.my-site.com/gtfs-feed.zip",
     destructive: false,
     start_at: (DateTime.now - 3.minutes).to_s,
-    end_at: DateTime.now.to_s
+    end_at: DateTime.now.to_s,
+    duration_seconds: 180.0,
+    duration_readable: "00:03:00"
   } }
 
   let(:hosted_schedule) { {
@@ -34,7 +36,6 @@ RSpec.shared_context "schedule report email options" do
 
   let(:error_results) {
     blank_results.merge(
-      end_at: "",
       errors: [ { class: "MyError", message: "Oh, something went wrong" } ]
     )
   }

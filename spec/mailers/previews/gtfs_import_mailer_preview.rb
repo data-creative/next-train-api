@@ -55,11 +55,21 @@ class GtfsImportMailerPreview < ActionMailer::Preview
   end
 
   def blank_results
+    start_at = (Time.zone.now - 3.minutes)
+    end_at = Time.zone.now
+    duration_seconds = end_at - start_at
+    puts "SECONDS:\n"
+    puts duration_seconds
+    duration_readable = Time.at(duration_seconds).utc.strftime("%H:%M:%S")
+    puts "READABLE:\n"
+    puts duration_readable
     {
       source_url: "http://www.my-site.com/gtfs-feed.zip",
       destructive: false,
-      start_at: (DateTime.now - 3.minutes).to_s,
-      end_at: DateTime.now.to_s
+      start_at: start_at.to_s,
+      end_at: end_at.to_s,
+      duration_seconds: duration_seconds,
+      duration_readable: duration_readable
     }
   end
 

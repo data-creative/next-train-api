@@ -8,6 +8,14 @@
       </div>
       <% end %>
 
+      <% if @start_at && @end_at && @duration_readable %>
+      <div id="job-performance-times">
+        <p>Job performance:</p>
+
+        <p><pre><%= JSON.pretty_generate({start_at: @start_at, end_at: @end_at, duration: @duration_readable}) %></pre></p>
+      </div>
+      <% end %>
+
       <% if @hosted_schedule %>
       <div id="hosted-schedule">
         <p>Hosted Schedule:</p>

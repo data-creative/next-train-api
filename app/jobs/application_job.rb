@@ -18,12 +18,18 @@ class ApplicationJob < ActiveJob::Base
   def clock_out
     @end_at = Time.zone.now
     results[:end_at] = @end_at.to_s
+    results[:duration_seconds] = duration_seconds
+    results[:duration_readable] = duration_readable
     logger.info{ "JOB ENDED AFTER #{duration_seconds} SECONDS" }
     @end_at
   end
 
   def duration_seconds
     end_at - start_at if end_at && start_at
+  end
+
+  def duration_readable
+    Time.at(duration_seconds).utc.strftime("%H:%M:%S")
   end
 
   # @param err [Exception] like StandardError.new("OOPS")

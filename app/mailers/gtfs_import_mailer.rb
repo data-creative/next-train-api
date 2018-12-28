@@ -6,6 +6,10 @@ class GtfsImportMailer < ApplicationMailer
     @results = params[:results]
     validate_results
     @source_url = @results[:source_url]
+    @start_at = @results[:start_at]
+    @end_at = @results[:end_at]
+    #@duration_seconds = @results[:duration_seconds]
+    @duration_readable = @results[:duration_readable]
     @hosted_schedule = @results[:hosted_schedule]
     @schedule_activation = @results[:schedule_activation] == true
     @schedule_verification = @results[:schedule_verification] == true
