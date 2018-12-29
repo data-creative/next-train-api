@@ -16,6 +16,9 @@ gem 'devise' #, '~> 4.2.0'
 gem 'httparty' #, '~> 0.13.3'
 gem 'rubyzip' #, '>= 1.0.0'
 
+gem 'analytics-ruby', '~> 2.0.0', :require => 'segment/analytics'
+#gem "simple_segment"
+
 gem 'yard', group: :docs # run `bundle exec yard doc` to parse comments and/or `bundle exec yard server` to view documentation at *localhost:8808*
 
 group :development, :test do
